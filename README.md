@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ☀️ SUNAI Pro — Monetized AI Assistant
 
 ## ⚡ Run Locally (3 steps)
@@ -27,3 +28,7 @@ python app.py               # Open http://localhost:5000
 - Schema.org JSON-LD
 - /sitemap.xml + /robots.txt auto-generated
 - Submit URL to: search.google.com/search-console
+=======
+# Sunai-ai-assistant
+SUNAI - FREE AI ASSISTANT built with Python &amp; Flask
+>>>>>>> 46c31b6ab267ee8cbf3c347f943ba84bc6dd5ad9
