@@ -2,401 +2,587 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- SEO Meta Tags -->
-<title>SUNAI — Free AI Assistant | Ask Anything, Get Instant Answers</title>
-<meta name="description" content="SUNAI is a free AI assistant that answers any question instantly — coding, science, career advice, math, and more. Powered by advanced AI.">
-<meta name="keywords" content="AI assistant, free AI chatbot, ask AI, SUNAI, AI search, coding help, homework help, AI India">
-<meta name="author" content="SUNAI">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://sunai.onrender.com/">
-
-<!-- Open Graph (WhatsApp, Facebook preview) -->
-<meta property="og:title" content="SUNAI — Ask Anything, Get Instant AI Answers">
-<meta property="og:description" content="Free AI assistant for coding, science, career, and more. Try SUNAI now!">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://sunai.onrender.com/">
-<meta property="og:image" content="https://sunai.onrender.com/static/og-image.png">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="SUNAI — Free AI Assistant">
-<meta name="twitter:description" content="Ask anything. Get instant AI answers.">
-
-<!-- Schema.org for Google -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "SUNAI",
-  "description": "Free AI assistant that answers any question instantly",
-  "url": "https://sunai.onrender.com",
-  "applicationCategory": "UtilitiesApplication",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "INR"
-  }
-}
-</script>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SUNAI — Free AI Assistant | Ask Anything</title>
+<meta name="description" content="SUNAI is a free AI assistant. Ask anything, upload images and files, get instant answers.">
+<meta name="keywords" content="SUNAI, AI assistant, free AI, chatbot, image analysis, file analysis">
+<meta property="og:title" content="SUNAI — Free AI Assistant">
+<meta property="og:description" content="Ask anything. Upload images & files. Get instant AI answers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --sun:#FF6B00;--sun-l:#FF8C3A;--sun-glow:rgba(255,107,0,0.18);
-  --bg:#09090E;--s1:#111118;--s2:#18181F;--s3:#1E1E28;
-  --border:rgba(255,255,255,0.07);--text:#EDEDF2;--muted:#5C5C72;
-  --green:#22C55E;--red:#EF4444;
-}
-html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+:root{--sun:#FF6B00;--sun-l:#FF8C3A;--glow:rgba(255,107,0,0.18);--bg:#09090E;--s1:#111118;--s2:#18181F;--s3:#1E1E28;--border:rgba(255,255,255,0.07);--text:#EDEDF2;--muted:#5C5C72;--green:#22C55E;--red:#EF4444;}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+body{display:flex;flex-direction:column;overflow:hidden}
 
 /* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:54px;border-bottom:0.5px solid var(--border);background:var(--s1);flex-shrink:0;z-index:100}
-.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
-.logo-orb{width:32px;height:32px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px var(--sun-glow);animation:pulse 3s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 16px var(--sun-glow)}50%{box-shadow:0 0 28px rgba(255,107,0,0.4)}}
-.logo-orb svg{width:17px;height:17px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
-.logo-name{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--text)}
-.logo-name span{color:var(--sun)}
-.header-right{display:flex;align-items:center;gap:8px}
-.usage-pill{font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--border);color:var(--muted);background:var(--s2);display:none}
-.usage-pill.show{display:block}
-.usage-pill.low{border-color:rgba(239,68,68,0.4);color:var(--red)}
-.btn{font-size:12px;padding:6px 14px;border-radius:8px;border:0.5px solid var(--border);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
-.btn-ghost{background:transparent;color:var(--muted)}
-.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.15)}
-.btn-sun{background:var(--sun);color:white;border-color:transparent;box-shadow:0 0 10px var(--sun-glow)}
-.btn-sun:hover{background:var(--sun-l)}
-.btn-pro{background:linear-gradient(135deg,#FFB347,#FF6B00);color:white;border:none}
-.user-name{font-size:13px;color:var(--muted)}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;border-bottom:.5px solid var(--border);background:var(--s1);flex-shrink:0}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.orb{width:30px;height:30px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px var(--glow);animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 14px var(--glow)}50%{box-shadow:0 0 28px rgba(255,107,0,.4)}}
+.orb svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700}
+.logo-text span{color:var(--sun)}
+.hright{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.plan-badge{font-size:11px;padding:2px 8px;border-radius:20px;border:.5px solid var(--border);color:var(--muted);background:var(--s2)}
+.plan-badge.pro{border-color:rgba(255,107,0,.4);color:var(--sun)}
+#user-name{font-size:12px;color:var(--muted)}
+.hbtn{font-size:12px;padding:5px 12px;border-radius:7px;border:.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.hbtn:hover{color:var(--text)}
+.hbtn.primary{background:var(--sun);color:white;border-color:var(--sun)}
+.hbtn.primary:hover{background:var(--sun-l)}
 
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
-.modal-bg.show{display:flex}
-.modal{background:var(--s1);border:0.5px solid var(--border);border-radius:18px;padding:28px;width:100%;max-width:380px;position:relative}
-.modal h2{font-family:'Space Grotesk',sans-serif;font-size:20px;margin-bottom:4px}
-.modal h2 span{color:var(--sun)}
-.modal p{font-size:13px;color:var(--muted);margin-bottom:20px}
-.close-modal{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
-.tabs-auth{display:flex;gap:0;border:0.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px}
-.tab-auth{flex:1;padding:8px;font-size:13px;background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all .2s}
-.tab-auth.active{background:var(--s2);color:var(--text)}
-.field{margin-bottom:12px}
-.field label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
-.field input{width:100%;padding:9px 12px;background:var(--s2);border:0.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif}
-.field input:focus{border-color:rgba(255,107,0,0.4)}
-.auth-btn{width:100%;padding:10px;background:var(--sun);border:none;border-radius:8px;color:white;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
-.auth-btn:hover{background:var(--sun-l)}
-.auth-err{font-size:12px;color:var(--red);margin-top:8px;text-align:center;min-height:16px}
-.upgrade-modal .perks{list-style:none;margin:12px 0 20px}
-.upgrade-modal .perks li{font-size:13px;padding:6px 0;border-bottom:0.5px solid var(--border);color:var(--muted)}
-.upgrade-modal .perks li::before{content:"✓ ";color:var(--green)}
-.price{font-size:28px;font-weight:700;color:var(--text);margin:8px 0 4px}
-.price span{font-size:14px;color:var(--muted);font-weight:400}
+/* USAGE */
+#usage-bar{display:none;padding:5px 16px;background:var(--s2);border-bottom:.5px solid var(--border);flex-shrink:0}
+.usage-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;gap:8px}
+.usage-label{font-size:11px;color:var(--muted);white-space:nowrap}
+.bar-track{flex:1;height:3px;background:var(--s3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;background:var(--sun);border-radius:3px;transition:width .4s}
+.bar-fill.danger{background:var(--red)}
+.usage-count{font-size:11px;color:var(--muted);white-space:nowrap}
+.up-mini{font-size:11px;padding:2px 8px;border-radius:12px;background:rgba(255,107,0,.1);border:.5px solid rgba(255,107,0,.3);color:var(--sun);cursor:pointer}
 
-/* CHAT */
-body{display:flex;flex-direction:column}
-#chat{flex:1;overflow-y:auto;padding:20px 0;display:flex;flex-direction:column;scroll-behavior:smooth}
+/* SIDEBAR */
+.layout{display:flex;flex:1;overflow:hidden}
+#sidebar{width:220px;background:var(--s1);border-right:.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sidebar-header{padding:12px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-title{font-size:12px;font-weight:500;color:var(--muted)}
+.clear-btn{font-size:11px;padding:3px 8px;border-radius:6px;border:.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer}
+.clear-btn:hover{color:var(--red);border-color:var(--red)}
+#history-list{flex:1;overflow-y:auto;padding:8px}
+#history-list::-webkit-scrollbar{width:3px}
+#history-list::-webkit-scrollbar-thumb{background:var(--border)}
+.hist-item{font-size:12px;padding:7px 10px;border-radius:7px;color:var(--muted);cursor:pointer;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:.5px solid transparent}
+.hist-item:hover{background:var(--s2);color:var(--text);border-color:var(--border)}
+.hist-date{font-size:10px;color:var(--muted);padding:4px 10px;margin-top:6px}
+.no-history{font-size:12px;color:var(--muted);text-align:center;padding:20px 10px;line-height:1.6}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#chat{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;scroll-behavior:smooth}
 #chat::-webkit-scrollbar{width:4px}
 #chat::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
 /* WELCOME */
-#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:28px 20px;gap:16px}
-.sun-hero{width:68px;height:68px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;box-shadow:0 0 48px var(--sun-glow);animation:pulse 3s ease-in-out infinite}
-.sun-hero svg{width:34px;height:34px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
-#welcome h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.5px}
+#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:24px;text-align:center;gap:14px}
+.sun-hero{width:60px;height:60px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px var(--glow);animation:pulse 3s ease-in-out infinite}
+.sun-hero svg{width:30px;height:30px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
+#welcome h1{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
 #welcome h1 span{color:var(--sun)}
-#welcome p{font-size:13px;color:var(--muted);max-width:320px;line-height:1.7}
-.chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:4px}
-.chip{font-size:12px;padding:6px 14px;border-radius:20px;border:0.5px solid var(--border);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .2s}
-.chip:hover{border-color:rgba(255,107,0,.5);color:var(--sun);background:rgba(255,107,0,.06)}
-.free-note{font-size:12px;color:var(--muted);padding:6px 16px;border-radius:20px;border:0.5px solid var(--border);background:var(--s2)}
-.free-note span{color:var(--sun)}
+#welcome p{font-size:13px;color:var(--muted);max-width:300px;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.chip{font-size:11px;padding:6px 12px;border-radius:16px;border:.5px solid var(--border);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .2s}
+.chip:hover{border-color:rgba(255,107,0,.5);color:var(--sun)}
 
 /* MESSAGES */
-.msg-wrap{padding:5px 0;animation:fadeUp .22s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.msg-inner{max-width:700px;margin:0 auto;padding:0 20px;display:flex;gap:10px;align-items:flex-start}
-.msg-wrap.user .msg-inner{flex-direction:row-reverse}
-.av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;font-size:11px;font-weight:600}
-.av.ai-av{background:var(--sun);box-shadow:0 0 8px var(--sun-glow)}
-.av.ai-av svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
-.av.u-av{background:var(--s3);border:0.5px solid var(--border);color:var(--muted);font-size:10px}
-.bubble{max-width:82%;padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.7}
-.msg-wrap.ai .bubble{background:var(--s1);border:0.5px solid var(--border);border-radius:4px 16px 16px 16px}
-.msg-wrap.user .bubble{background:var(--s2);border:0.5px solid rgba(255,107,0,.15);border-radius:16px 4px 16px 16px}
-.bubble p{margin-bottom:7px}.bubble p:last-child{margin:0}
-.bubble strong{color:var(--sun-l);font-weight:500}
-.bubble code{background:var(--s3);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;color:#A8D8A8}
-.bubble pre{background:var(--s3);padding:10px 12px;border-radius:8px;font-size:12px;overflow-x:auto;margin:7px 0;border:0.5px solid var(--border);font-family:monospace}
+.mw{padding:4px 0;animation:up .2s ease}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.mi{max-width:700px;margin:0 auto;padding:0 16px;display:flex;gap:10px;align-items:flex-start}
+.mw.user .mi{flex-direction:row-reverse}
+.av{width:27px;height:27px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;font-size:11px;font-weight:600}
+.av.aav{background:var(--sun);box-shadow:0 0 8px var(--glow)}
+.av.aav svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
+.av.uav{background:var(--s3);border:.5px solid var(--border);color:var(--muted)}
+.bub{max-width:82%;padding:10px 14px;border-radius:13px;font-size:13.5px;line-height:1.7}
+.mw.ai .bub{background:var(--s1);border:.5px solid var(--border);border-radius:3px 13px 13px 13px}
+.mw.user .bub{background:var(--s2);border:.5px solid rgba(255,107,0,.15);border-radius:13px 3px 13px 13px}
+.bub p{margin-bottom:6px}.bub p:last-child{margin:0}
+.bub strong{color:var(--sun-l);font-weight:500}
+.bub code{background:var(--s3);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;color:#86EFAC}
+.bub pre{background:var(--s3);padding:10px 12px;border-radius:8px;font-size:12px;overflow-x:auto;margin:6px 0;border:.5px solid var(--border);font-family:monospace}
+.img-preview{max-width:200px;border-radius:8px;margin-bottom:6px;border:.5px solid var(--border)}
 .typing{display:flex;gap:4px;align-items:center;padding:2px 0}
-.dot{width:6px;height:6px;background:var(--sun);border-radius:50%;animation:bop 1.2s ease-in-out infinite}
+.dot{width:5px;height:5px;background:var(--sun);border-radius:50%;animation:bop 1.2s ease-in-out infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
 @keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 
-/* LIMIT BANNER */
-.limit-banner{max-width:700px;margin:8px auto;padding:0 20px}
-.limit-box{background:rgba(239,68,68,.08);border:0.5px solid rgba(239,68,68,.3);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.limit-box p{font-size:13px;color:#FCA5A5}
-.limit-box button{font-size:12px;padding:6px 14px;border-radius:8px;background:var(--sun);border:none;color:white;cursor:pointer;white-space:nowrap}
-
 /* INPUT */
-.input-wrap{padding:12px 20px 16px;border-top:0.5px solid var(--border);background:var(--s1);flex-shrink:0}
-.input-box{max-width:700px;margin:0 auto}
-.input-row{display:flex;gap:9px;align-items:flex-end;background:var(--s2);border:0.5px solid var(--border);border-radius:14px;padding:9px 11px;transition:border-color .2s}
-.input-row:focus-within{border-color:rgba(255,107,0,.4);box-shadow:0 0 0 3px rgba(255,107,0,.05)}
-textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;resize:none;max-height:110px;min-height:22px;line-height:1.6}
+.inp-wrap{padding:10px 16px 14px;border-top:.5px solid var(--border);background:var(--s1);flex-shrink:0}
+.inp-box{max-width:700px;margin:0 auto}
+
+/* File/Image preview bar */
+#attach-preview{display:none;background:var(--s2);border:.5px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--muted);align-items:center;gap:8px}
+#attach-preview span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#attach-preview img{width:40px;height:40px;object-fit:cover;border-radius:6px}
+#remove-attach{cursor:pointer;color:var(--red);font-size:16px;flex-shrink:0}
+
+.inp-row{display:flex;gap:8px;align-items:flex-end;background:var(--s2);border:.5px solid var(--border);border-radius:12px;padding:8px 10px;transition:border-color .2s}
+.inp-row:focus-within{border-color:rgba(255,107,0,.4);box-shadow:0 0 0 3px rgba(255,107,0,.05)}
+.attach-btns{display:flex;gap:4px;flex-shrink:0}
+.att-btn{width:30px;height:30px;background:var(--s3);border:.5px solid var(--border);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.att-btn:hover{border-color:rgba(255,107,0,.4);background:rgba(255,107,0,.08)}
+.att-btn svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.att-btn:hover svg{stroke:var(--sun)}
+textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;resize:none;max-height:100px;min-height:22px;line-height:1.6}
 textarea::placeholder{color:var(--muted)}
-.send{width:34px;height:34px;background:var(--sun);border:none;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;box-shadow:0 0 10px var(--sun-glow)}
-.send:hover{background:var(--sun-l);transform:scale(1.05)}
-.send:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
-.send svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.hint{text-align:center;font-size:11px;color:var(--muted);margin-top:8px}
+.snd{width:32px;height:32px;background:var(--sun);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;box-shadow:0 0 10px var(--glow)}
+.snd:hover{background:var(--sun-l);transform:scale(1.06)}
+.snd:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.snd svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hint{text-align:center;font-size:10px;color:var(--muted);margin-top:6px}
+input[type=file]{display:none}
+
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.overlay.show{display:flex}
+.modal{background:var(--s1);border:.5px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:360px;animation:up .2s ease}
+.modal h2{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:3px}
+.modal h2 span{color:var(--sun)}
+.modal p{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.field{margin-bottom:11px}
+.field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.field input{width:100%;background:var(--s2);border:.5px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:rgba(255,107,0,.4)}
+.mbtn{width:100%;padding:10px;border-radius:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;margin-top:3px}
+.mbtn.sun{background:var(--sun);color:white;box-shadow:0 0 12px var(--glow)}
+.mbtn.sun:hover{background:var(--sun-l)}
+.mbtn.ghost{background:var(--s2);color:var(--muted);border:.5px solid var(--border);margin-top:6px}
+.mbtn.ghost:hover{color:var(--text)}
+.merr{font-size:11px;color:var(--red);margin-top:6px;text-align:center;min-height:14px}
+.mtab{display:flex;gap:0;margin-bottom:16px;background:var(--s2);border-radius:8px;padding:3px}
+.mtab button{flex:1;padding:6px;border:none;border-radius:6px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .2s}
+.mtab button.active{background:var(--s1);color:var(--text)}
+.switch{font-size:11px;color:var(--muted);text-align:center;margin-top:10px}
+.switch a{color:var(--sun);cursor:pointer}
+.plan-card{background:var(--s2);border:.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.plan-card.featured{border-color:rgba(255,107,0,.4);background:rgba(255,107,0,.04)}
+.plan-name{font-size:12px;font-weight:600;margin-bottom:3px}
+.plan-price{font-size:20px;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.plan-price span{font-size:12px;font-weight:400;color:var(--muted)}
+.plan-feat{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.8;list-style:none}
+.plan-feat li::before{content:"✓ ";color:var(--green)}
+
+/* Mobile sidebar toggle */
+#mob-sidebar-btn{display:none;background:transparent;border:none;cursor:pointer;padding:4px}
+@media(max-width:600px){
+  #sidebar{display:none;position:fixed;inset:0;z-index:150;width:100%}
+  #sidebar.open{display:flex}
+  #mob-sidebar-btn{display:block}
+  .hbtn span{display:none}
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
-  <a class="logo" href="/">
-    <div class="logo-orb">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-    </div>
-    <div class="logo-name">SUN<span>AI</span></div>
-  </a>
-  <div class="header-right">
-    <div class="usage-pill" id="usage-pill"></div>
-    {% if user %}
-      <span class="user-name">Hi, {{ user.name.split()[0] }} 👋</span>
-      {% if user.plan == 'free' %}
-        <button class="btn btn-pro" onclick="showUpgrade()">⚡ Upgrade Pro</button>
-      {% else %}
-        <span class="btn btn-ghost" style="color:#FFB347;border-color:rgba(255,179,71,.3)">⚡ Pro</span>
-      {% endif %}
-      <a href="/logout" class="btn btn-ghost">Logout</a>
-    {% else %}
-      <button class="btn btn-ghost" onclick="showAuth('login')">Login</button>
-      <button class="btn btn-sun" onclick="showAuth('register')">Sign up Free</button>
-    {% endif %}
+  <div style="display:flex;align-items:center;gap:8px">
+    <button id="mob-sidebar-btn" onclick="toggleSidebar()" aria-label="History">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a class="logo" href="/">
+      <div class="orb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
+      <span class="logo-text">SUN<span>AI</span></span>
+    </a>
+  </div>
+  <div class="hright">
+    <span id="plan-badge" class="plan-badge" style="display:none"></span>
+    <span id="user-name" style="display:none"></span>
+    <button class="hbtn primary" id="btn-upgrade" style="display:none" onclick="openUpgrade()">⚡ Pro</button>
+    <button class="hbtn" id="btn-login" onclick="openAuth('login')">Login</button>
+    <button class="hbtn primary" id="btn-signup" onclick="openAuth('signup')">Sign Up Free</button>
+    <button class="hbtn" id="btn-logout" style="display:none" onclick="logout()">Logout</button>
   </div>
 </header>
 
+<div id="usage-bar">
+  <div class="usage-inner">
+    <span class="usage-label">Queries today</span>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+    <span class="usage-count" id="usage-count"></span>
+    <span class="up-mini" onclick="openUpgrade()">Upgrade ↑</span>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR: Chat History -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">💬 Chat History</span>
+      <button class="clear-btn" onclick="clearHistory()">Clear all</button>
+    </div>
+    <div id="history-list">
+      <div class="no-history">Sign in to see your chat history</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="chat">
+      <div id="welcome">
+        <div class="sun-hero"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
+        <h1>Ask anything to <span>SUNAI</span></h1>
+        <p>Free AI assistant — chat, upload images & files, get instant answers!</p>
+        <div class="chips">
+          <div class="chip" onclick="q('What is machine learning?')">What is machine learning?</div>
+          <div class="chip" onclick="q('Write a Python hello world')">Python hello world</div>
+          <div class="chip" onclick="q('How to get a data science job?')">Data science career</div>
+          <div class="chip" onclick="q('Explain neural networks simply')">Neural networks</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inp-wrap">
+      <div class="inp-box">
+        <div id="attach-preview">
+          <img id="preview-img" style="display:none">
+          <svg id="preview-file-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" style="display:none;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span id="attach-name"></span>
+          <span id="remove-attach" onclick="removeAttach()">✕</span>
+        </div>
+        <div class="inp-row">
+          <div class="attach-btns">
+            <button class="att-btn" onclick="document.getElementById('img-input').click()" title="Upload image">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </button>
+            <button class="att-btn" onclick="document.getElementById('file-input').click()" title="Upload file">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </button>
+          </div>
+          <textarea id="inp" rows="1" placeholder="Ask SUNAI anything… or upload an image/file" onkeydown="onKey(event)" oninput="grow(this)"></textarea>
+          <button class="snd" id="snd" onclick="send()" aria-label="Send">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div class="hint">SUNAI · Enter to send · 📎 image & file upload supported</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="img-input" accept="image/*" onchange="attachImage(this)">
+<input type="file" id="file-input" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)">
+
 <!-- AUTH MODAL -->
-<div class="modal-bg" id="auth-modal">
+<div class="overlay" id="auth-modal">
   <div class="modal">
-    <button class="close-modal" onclick="closeModal('auth-modal')">×</button>
-    <h2>Welcome to <span>SUNAI</span></h2>
-    <p>Your free AI assistant — 10 questions free every day</p>
-    <div class="tabs-auth">
-      <button class="tab-auth active" id="tab-login" onclick="switchTab('login')">Login</button>
-      <button class="tab-auth" id="tab-register" onclick="switchTab('register')">Sign Up</button>
+    <div class="mtab">
+      <button id="tab-login" onclick="switchTab('login')">Login</button>
+      <button id="tab-signup" onclick="switchTab('signup')" class="active">Sign Up</button>
     </div>
-    <div id="form-login">
-      <div class="field"><label>Email</label><input type="email" id="l-email" placeholder="you@email.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="l-pw" placeholder="••••••••"></div>
-      <button class="auth-btn" onclick="doLogin()">Login to SUNAI</button>
+    <h2>Join <span>SUNAI</span></h2>
+    <p id="auth-sub">Create free account — 10 AI queries daily.</p>
+    <div class="field" id="name-field">
+      <label>Your Name</label>
+      <input type="text" id="a-name" placeholder="Enter your name">
     </div>
-    <div id="form-register" style="display:none">
-      <div class="field"><label>Your Name</label><input type="text" id="r-name" placeholder="Sundar Kumar"></div>
-      <div class="field"><label>Email</label><input type="email" id="r-email" placeholder="you@email.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="r-pw" placeholder="Min 6 characters"></div>
-      <button class="auth-btn" onclick="doRegister()">Create Free Account</button>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="a-email" placeholder="you@email.com">
     </div>
-    <div class="auth-err" id="auth-err"></div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="a-pw" placeholder="Password">
+    </div>
+    <div class="merr" id="auth-err"></div>
+    <button class="mbtn sun" id="auth-btn" onclick="submitAuth()">Create Free Account</button>
+    <button class="mbtn ghost" onclick="closeModal('auth-modal')">Cancel</button>
   </div>
 </div>
 
 <!-- UPGRADE MODAL -->
-<div class="modal-bg" id="upgrade-modal">
-  <div class="modal upgrade-modal">
-    <button class="close-modal" onclick="closeModal('upgrade-modal')">×</button>
-    <h2>⚡ Upgrade to <span>Pro</span></h2>
-    <p>Unlock unlimited AI power with SUNAI Pro</p>
-    <ul class="perks">
-      <li>Unlimited questions every day</li>
-      <li>Faster responses, priority access</li>
-      <li>Code execution & file analysis</li>
-      <li>No ads, ever</li>
-      <li>Support SUNAI's development 🙏</li>
-    </ul>
-    <div class="price">₹99 <span>/ month</span></div>
-    <button class="auth-btn" onclick="doUpgrade()">Upgrade Now — ₹99/month</button>
-    <div class="auth-err" id="upgrade-msg"></div>
-  </div>
-</div>
-
-<!-- CHAT AREA -->
-<div id="chat">
-  <div id="welcome">
-    <div class="sun-hero">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+<div class="overlay" id="upgrade-modal">
+  <div class="modal">
+    <h2>Upgrade to <span>Pro</span></h2>
+    <p>Unlock unlimited queries and priority responses.</p>
+    <div class="plan-card">
+      <div class="plan-name">Free Plan</div>
+      <div class="plan-price">₹0 <span>/month</span></div>
+      <ul class="plan-feat"><li>10 queries/day</li><li>Image & file upload</li><li>Chat history</li></ul>
     </div>
-    <h1>Ask anything to <span>SUNAI</span></h1>
-    <p>Your intelligent assistant — answers coding, science, career, math, and anything else instantly.</p>
-    <div class="chips">
-      <div class="chip" onclick="quick('What is machine learning?')">What is machine learning?</div>
-      <div class="chip" onclick="quick('Write a Python hello world program')">Python hello world</div>
-      <div class="chip" onclick="quick('How do I get a job in data science?')">Data science career</div>
-      <div class="chip" onclick="quick('Explain AI in simple words')">Explain AI simply</div>
-      <div class="chip" onclick="quick('What is the difference between AI and ML?')">AI vs ML</div>
-      <div class="chip" onclick="quick('Give me 5 tips to improve coding skills')">Coding tips</div>
+    <div class="plan-card featured">
+      <div class="plan-name" style="color:var(--sun)">⚡ Pro Plan</div>
+      <div class="plan-price">₹99 <span>/month</span></div>
+      <ul class="plan-feat"><li>Unlimited queries</li><li>Image & file upload</li><li>Full chat history</li><li>Priority support</li></ul>
     </div>
-    {% if not user %}
-    <div class="free-note">✦ <span>10 free questions/day</span> — No credit card needed</div>
-    {% endif %}
-  </div>
-</div>
-
-<!-- INPUT -->
-<div class="input-wrap">
-  <div class="input-box">
-    <div class="input-row">
-      <textarea id="inp" rows="1" placeholder="Ask SUNAI anything…" onkeydown="onKey(event)" oninput="grow(this)"></textarea>
-      <button class="send" id="send" onclick="send()" aria-label="Send">
-        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-    </div>
-    <div class="hint">SUNAI · Enter to send · Shift+Enter for new line · <a href="#" onclick="showUpgrade()" style="color:var(--sun);text-decoration:none">⚡ Go Pro for unlimited</a></div>
+    <div class="merr" id="pay-err"></div>
+    <button class="mbtn sun" onclick="payNow()">Pay ₹99 with Razorpay</button>
+    <button class="mbtn ghost" onclick="closeModal('upgrade-modal')">Maybe later</button>
   </div>
 </div>
 
 <script>
-const isLoggedIn = {{ 'true' if user else 'false' }};
-const userPlan   = "{{ user.plan if user else 'none' }}";
-let history = [], busy = false;
+const chatEl = document.getElementById('chat');
+const inpEl  = document.getElementById('inp');
+const sndEl  = document.getElementById('snd');
+let history_msgs = [], busy = false, userData = null, authMode = 'signup';
+let attachedFile = null, attachedImage = null, attachedType = null;
 
-function aiIcon(){
-  return `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`;
+function icon(){return`<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>`;}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+async function init(){
+  // Auto-fill email from localStorage
+  const savedEmail = localStorage.getItem('sunai_email');
+  if(savedEmail) document.getElementById('a-email').value = savedEmail;
+
+  try{
+    const r = await fetch('/me', {credentials:'include'}).then(x=>x.json());
+    if(r.name){
+      userData = r;
+      showLoggedIn(r);
+      loadHistory();
+    }
+  }catch(e){}
+}
+init();
+
+function showLoggedIn(u){
+  document.getElementById('btn-login').style.display='none';
+  document.getElementById('btn-signup').style.display='none';
+  document.getElementById('btn-logout').style.display='block';
+  document.getElementById('user-name').style.display='block';
+  document.getElementById('user-name').textContent = u.name;
+  const pb = document.getElementById('plan-badge');
+  pb.style.display='block';
+  pb.textContent = u.plan==='pro'?'⚡ Pro':'Free';
+  if(u.plan==='pro') pb.classList.add('pro');
+  if(u.plan==='free'){
+    document.getElementById('btn-upgrade').style.display='block';
+    document.getElementById('usage-bar').style.display='block';
+    updateUsageBar(u);
+  }
+}
+
+function updateUsageBar(u){
+  const pct = (u.used_today/10)*100;
+  const fill = document.getElementById('bar-fill');
+  fill.style.width = pct+'%';
+  if(pct>=80) fill.classList.add('danger');
+  document.getElementById('usage-count').textContent = u.used_today+'/10';
+}
+
+// ── HISTORY ──────────────────────────────────────────────────────────────
+async function loadHistory(){
+  try{
+    const r = await fetch('/history',{credentials:'include'}).then(x=>x.json());
+    const list = document.getElementById('history-list');
+    if(!r.history || r.history.length===0){
+      list.innerHTML='<div class="no-history">No conversations yet.<br>Start chatting!</div>';
+      return;
+    }
+    // Group by date
+    const grouped = {};
+    r.history.filter(m=>m.role==='user').forEach(m=>{
+      const d = m.time||'Today';
+      if(!grouped[d]) grouped[d]=[];
+      grouped[d].push(m.content);
+    });
+    list.innerHTML = Object.entries(grouped).reverse().map(([d,msgs])=>
+      `<div class="hist-date">${d}</div>` +
+      msgs.slice(-5).reverse().map(m=>
+        `<div class="hist-item" onclick="q('${m.replace(/'/g,"\\'").substring(0,60)}')" title="${m}">
+          💬 ${m.substring(0,40)}${m.length>40?'...':''}
+        </div>`
+      ).join('')
+    ).join('');
+  }catch(e){}
+}
+
+async function clearHistory(){
+  if(!confirm('Clear all chat history?')) return;
+  await fetch('/history/clear',{method:'POST',credentials:'include'});
+  document.getElementById('history-list').innerHTML='<div class="no-history">History cleared!</div>';
+}
+
+// ── ATTACH ──────────────────────────────────────────────────────────────
+function attachImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  attachedImage = file;
+  attachedType = 'image';
+  const preview = document.getElementById('attach-preview');
+  const img = document.getElementById('preview-img');
+  const fileIcon = document.getElementById('preview-file-icon');
+  img.src = URL.createObjectURL(file);
+  img.style.display='block';
+  fileIcon.style.display='none';
+  document.getElementById('attach-name').textContent = file.name;
+  preview.style.display='flex';
+  input.value='';
+}
+
+function attachFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  attachedFile = file;
+  attachedType = 'file';
+  const preview = document.getElementById('attach-preview');
+  document.getElementById('preview-img').style.display='none';
+  document.getElementById('preview-file-icon').style.display='block';
+  document.getElementById('attach-name').textContent = file.name;
+  preview.style.display='flex';
+  input.value='';
+}
+
+function removeAttach(){
+  attachedFile = attachedImage = attachedType = null;
+  document.getElementById('attach-preview').style.display='none';
+  document.getElementById('preview-img').src='';
+}
+
+// ── MESSAGES ──────────────────────────────────────────────────────────────
+function addMsg(role, html){
+  const w = document.createElement('div');
+  w.className = `mw ${role}`;
+  w.innerHTML = role==='ai'
+    ? `<div class="mi"><div class="av aav">${icon()}</div><div class="bub">${html}</div></div>`
+    : `<div class="mi"><div class="av uav">U</div><div class="bub">${html}</div></div>`;
+  chatEl.appendChild(w);
+  chatEl.scrollTop=99999;
+  return w;
 }
 
 function fmt(t){
   t=t.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${c.trim()}</code></pre>`);
   t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
   t=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
-  t=t.replace(/\*(.*?)\*/g,'<em>$1</em>');
   t=t.replace(/^#{1,3} (.+)$/gm,'<strong>$1</strong>');
   t=t.replace(/^- (.+)$/gm,'• $1');
   return t.split('\n\n').filter(p=>p.trim()).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
 }
 
-const chatEl=document.getElementById('chat');
-const inpEl=document.getElementById('inp');
-const sendEl=document.getElementById('send');
-
-function addMsg(role,html){
-  const w=document.createElement('div');
-  w.className=`msg-wrap ${role}`;
-  w.innerHTML=role==='ai'
-    ?`<div class="msg-inner"><div class="av ai-av">${aiIcon()}</div><div class="bubble">${html}</div></div>`
-    :`<div class="msg-inner"><div class="av u-av">You</div><div class="bubble">${html}</div></div>`;
-  chatEl.appendChild(w);
-  chatEl.scrollTop=chatEl.scrollHeight;
-  return w;
-}
-
-function showLimitBanner(){
-  const b=document.createElement('div');
-  b.className='limit-banner';
-  b.innerHTML=`<div class="limit-box"><p>🔒 You've used all 10 free questions today. Upgrade for unlimited access!</p><button onclick="showUpgrade()">⚡ Upgrade ₹99/mo</button></div>`;
-  chatEl.appendChild(b);
-  chatEl.scrollTop=chatEl.scrollHeight;
-}
-
-function updatePill(remaining, plan){
-  const pill=document.getElementById('usage-pill');
-  if(plan==='pro'){pill.textContent='⚡ Pro — Unlimited';pill.className='usage-pill show';return;}
-  pill.textContent=`${remaining} questions left today`;
-  pill.className='usage-pill show'+(remaining<=3?' low':'');
-}
-
+// ── SEND ──────────────────────────────────────────────────────────────────
 async function send(){
-  const txt=inpEl.value.trim();
-  if(!txt||busy) return;
-
-  if(!isLoggedIn){showAuth('register');return;}
+  const txt = inpEl.value.trim();
+  if((!txt && !attachedType) || busy) return;
+  if(!userData){ openAuth('signup'); return; }
 
   document.getElementById('welcome')?.remove();
-  inpEl.value='';grow(inpEl);
-  addMsg('user',`<p>${txt.replace(/</g,'&lt;')}</p>`);
-  history.push({role:'user',content:txt});
-  busy=true;sendEl.disabled=true;
+  inpEl.value=''; grow(inpEl);
+  busy=true; sndEl.disabled=true;
 
-  const tw=addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
-
-  try{
-    const res=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history})});
-    const data=await res.json();
-    if(res.status===429||data.error==='limit_reached'){
-      tw.remove();showLimitBanner();
-    } else if(data.error==='login_required'){
-      tw.remove();showAuth('register');
-    } else {
-      const reply=data.reply||data.error||'Something went wrong.';
-      history.push({role:'assistant',content:reply});
-      tw.querySelector('.bubble').innerHTML=fmt(reply);
-      if(data.remaining!==undefined) updatePill(data.remaining, data.plan);
-    }
-  }catch(e){
-    tw.querySelector('.bubble').innerHTML='<p>Connection error. Make sure the server is running.</p>';
+  if(attachedType==='image' && attachedImage){
+    const imgUrl = document.getElementById('preview-img').src;
+    addMsg('user',`${txt?`<p>${txt.replace(/</g,'&lt;')}</p>`:''}<img src="${imgUrl}" class="img-preview">`);
+    removeAttach();
+    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+    const fd = new FormData();
+    fd.append('image', attachedImage || document.getElementById('img-input').files[0]);
+    fd.append('question', txt || 'Describe this image in detail.');
+    try{
+      const res = await fetch('/analyze-image',{method:'POST',body:fd,credentials:'include'});
+      const data = await res.json();
+      tw.querySelector('.bub').innerHTML = data.error ? `<p style="color:var(--red)">${data.error}</p>` : fmt(data.reply);
+    }catch(e){tw.querySelector('.bub').innerHTML='<p>Error. Try again.</p>';}
+  } else if(attachedType==='file' && attachedFile){
+    const fname = attachedFile.name;
+    addMsg('user',`<p>📄 <strong>${fname}</strong>${txt?'<br>'+txt.replace(/</g,'&lt;'):''}</p>`);
+    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+    const fd = new FormData();
+    fd.append('file', attachedFile);
+    fd.append('question', txt || 'Summarize this document.');
+    removeAttach();
+    try{
+      const res = await fetch('/analyze-file',{method:'POST',body:fd,credentials:'include'});
+      const data = await res.json();
+      tw.querySelector('.bub').innerHTML = data.error ? `<p style="color:var(--red)">${data.error}</p>` : fmt(data.reply);
+    }catch(e){tw.querySelector('.bub').innerHTML='<p>Error. Try again.</p>';}
+  } else {
+    addMsg('user',`<p>${txt.replace(/</g,'&lt;')}</p>`);
+    history_msgs.push({role:'user',content:txt});
+    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+    try{
+      const res = await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({messages:history_msgs})});
+      const data = await res.json();
+      if(data.error==='limit_reached'){
+        tw.querySelector('.bub').innerHTML=`<p>${data.message} <strong onclick="openUpgrade()" style="color:var(--sun);cursor:pointer">Upgrade ↗</strong></p>`;
+        history_msgs.pop();
+      } else if(data.reply){
+        history_msgs.push({role:'assistant',content:data.reply});
+        tw.querySelector('.bub').innerHTML=fmt(data.reply);
+        if(data.remaining!==undefined && userData?.plan==='free'){
+          userData.used_today = 10-data.remaining;
+          updateUsageBar(userData);
+        }
+        loadHistory();
+      } else {
+        tw.querySelector('.bub').innerHTML=`<p style="color:var(--red)">${data.error||'Something went wrong.'}</p>`;
+        history_msgs.pop();
+      }
+    }catch(e){tw.querySelector('.bub').innerHTML='<p>Connection error.</p>';history_msgs.pop();}
   }
-  busy=false;sendEl.disabled=false;
-  chatEl.scrollTop=chatEl.scrollHeight;
-  inpEl.focus();
+
+  busy=false; sndEl.disabled=false;
+  chatEl.scrollTop=99999;
 }
 
-function quick(txt){inpEl.value=txt;send();}
+function q(txt){inpEl.value=txt; send();}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
-function grow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+function grow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
 
-// AUTH
-function showAuth(tab='login'){document.getElementById('auth-modal').classList.add('show');switchTab(tab);}
+// ── AUTH ──────────────────────────────────────────────────────────────────
+function openAuth(mode){
+  authMode=mode; switchTab(mode);
+  // Pre-fill email from localStorage
+  const saved = localStorage.getItem('sunai_email');
+  if(saved) document.getElementById('a-email').value=saved;
+  document.getElementById('auth-modal').classList.add('show');
+}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
-function showUpgrade(){document.getElementById('upgrade-modal').classList.add('show');}
-function switchTab(t){
-  document.getElementById('form-login').style.display=t==='login'?'block':'none';
-  document.getElementById('form-register').style.display=t==='register'?'block':'none';
-  document.getElementById('tab-login').className='tab-auth'+(t==='login'?' active':'');
-  document.getElementById('tab-register').className='tab-auth'+(t==='register'?' active':'');
+
+function switchTab(mode){
+  authMode=mode;
+  document.getElementById('tab-login').classList.toggle('active',mode==='login');
+  document.getElementById('tab-signup').classList.toggle('active',mode==='signup');
+  document.getElementById('name-field').style.display=mode==='signup'?'block':'none';
+  document.getElementById('auth-sub').textContent=mode==='signup'?'Create free account — 10 AI queries daily.':'Welcome back!';
+  document.getElementById('auth-btn').textContent=mode==='signup'?'Create Free Account':'Login';
   document.getElementById('auth-err').textContent='';
 }
 
-async function doLogin(){
-  const email=document.getElementById('l-email').value;
-  const pw=document.getElementById('l-pw').value;
-  const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
-  const data=await res.json();
-  if(data.success) location.reload();
-  else document.getElementById('auth-err').textContent=data.error;
+async function submitAuth(){
+  const name=document.getElementById('a-name').value.trim();
+  const email=document.getElementById('a-email').value.trim();
+  const pw=document.getElementById('a-pw').value;
+  const err=document.getElementById('auth-err');
+  if(authMode==='signup'&&!name){err.textContent='Name required';return;}
+  if(!email||!pw){err.textContent='Email and password required';return;}
+
+  const endpoint = authMode==='signup'?'/register':'/login';
+  const body = authMode==='signup'?{name,email,password:pw}:{email,password:pw};
+  const res = await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
+  const data = await res.json();
+  if(data.error){err.textContent=data.error;return;}
+
+  // Save email to localStorage for auto-fill next time
+  localStorage.setItem('sunai_email', email);
+
+  userData={name:data.name,plan:data.plan,used_today:0};
+  showLoggedIn(userData);
+  closeModal('auth-modal');
+  loadHistory();
+  const me = await fetch('/me',{credentials:'include'}).then(x=>x.json());
+  if(me.name){userData=me;if(me.plan==='free')updateUsageBar(me);}
 }
 
-async function doRegister(){
-  const name=document.getElementById('r-name').value;
-  const email=document.getElementById('r-email').value;
-  const pw=document.getElementById('r-pw').value;
-  if(pw.length<6){document.getElementById('auth-err').textContent='Password must be at least 6 characters';return;}
-  const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pw})});
-  const data=await res.json();
-  if(data.success) location.reload();
-  else document.getElementById('auth-err').textContent=data.error;
+async function logout(){
+  localStorage.removeItem('sunai_email');
+  await fetch('/logout',{credentials:'include'});
+  location.reload();
 }
 
-async function doUpgrade(){
-  const res=await fetch('/upgrade',{method:'POST'});
-  const data=await res.json();
-  if(data.success){document.getElementById('upgrade-msg').style.color='#22C55E';document.getElementById('upgrade-msg').textContent='🎉 Upgraded! Reloading...';setTimeout(()=>location.reload(),1200);}
-  else document.getElementById('upgrade-msg').textContent=data.error;
+// ── UPGRADE ──────────────────────────────────────────────────────────────
+function openUpgrade(){document.getElementById('upgrade-modal').classList.add('show');}
+
+async function payNow(){
+  const err=document.getElementById('pay-err');
+  err.textContent='Processing...';
+  err.style.color='var(--muted)';
+  setTimeout(async()=>{
+    const res=await fetch('/upgrade',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({payment_id:'demo_'+Date.now()})});
+    const data=await res.json();
+    if(data.success){
+      err.style.color='var(--green)';
+      err.textContent='✓ Upgraded to Pro!';
+      setTimeout(()=>{closeModal('upgrade-modal');location.reload();},1500);
+    }
+  },1000);
 }
 
-// Load usage on page load
-if(isLoggedIn){
-  fetch('/me').then(r=>r.json()).then(d=>{updatePill(d.remaining,d.plan);});
+// ── SIDEBAR TOGGLE (mobile) ───────────────────────────────────────────────
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
 }
-
-// Close modal on bg click
-document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');});});
 </script>
 </body>
 </html>
