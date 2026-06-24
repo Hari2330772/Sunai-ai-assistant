@@ -243,30 +243,30 @@ def analyze_file():
     file     = request.files["file"]
     question = request.form.get("question", "Summarize this document.")
     fname    = file.filename.lower()
-    try:
-        if fname.endswith(".pdf"):
-            import PyPDF2, io
-            reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
-            text   = "\n".join(p.extract_text() or "" for p in reader.pages)
-        elif fname.endswith((".txt",".py",".js",".html",".css",".csv",".md")):
-            text = file.read().decode("utf-8", errors="ignore")
-        else:
-            return jsonify({"error": "Unsupported file. Use PDF, TXT, PY, JS, HTML, CSV, MD"}), 400
-        text = text[:8000]
-        resp = groq_client.chat.completions.create(
-            model="qwen/qwen3.6-27b",
-            messages=[{"role": "system", "content": "You are SUNAI, a helpful AI assistant."},
-                      {"role": "user",   "content": f"File:\n\n{text}\n\nQuestion: {question}"}],
-            max_tokens=1500)
-        reply = resp.choices[0].message.content
-        usage[today] = used + 1
-        user["usage"] = usage
-        save_user(user)
-        add_history(uid, "user",      f"[File: {file.filename}] {question}")
-        add_history(uid, "assistant", reply)
-        return jsonify({"reply": reply})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+try:
+    if fname.endswith(".pdf"):
+        import PyPDF2, io
+        reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
+        text   = "\n".join(p.extract_text() or "" for p in reader.pages)
+    elif fname.endswith((".txt",".py",".js",".html",".css",".csv",".md")):
+        text = file.read().decode("utf-8", errors="ignore")
+    else:
+        return jsonify({"error": "Unsupported file. Use PDF, TXT, PY, JS, HTML, CSV, MD"}), 400
+    text = text[:8000]
+    resp = groq_client.chat.completions.create(
+        model="qwen/qwen3.6-27b",
+        messages=[{"role": "system", "content": "You are SUNAI, a helpful AI assistant."},
+                    {"role": "user",   "content": f"File:\n\n{text}\n\nQuestion: {question}"}],
+        max_tokens=1500)
+    reply = resp.choices[0].message.content
+    usage[today] = used + 1
+    user["usage"] = usage
+    save_user(user)
+    add_history(uid, "user",      f"[File: {file.filename}] {question}")
+    add_history(uid, "assistant", reply)
+    return jsonify({"reply": reply})
+except Exception as e:
+    return jsonify({"error": str(e)}), 500
 
 @app.route("/history")
 @login_required
