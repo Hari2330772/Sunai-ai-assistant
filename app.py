@@ -156,7 +156,7 @@ def chat():
     if not messages: return jsonify({"error": "No message"}), 400
     try:
         resp  = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "system", "content":
                 "You are SUNAI, a brilliant friendly AI assistant. Help with coding, science, career, math, and any topic. Be clear, concise and helpful."}
             ] + messages, max_tokens=1500)
@@ -248,7 +248,7 @@ def analyze_file():
             return jsonify({"error": "Unsupported file type. Upload PDF, TXT, PY, JS, HTML, CSV or MD"}), 400
         text = text[:8000]  # limit to avoid token overflow
         resp = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "system", "content": "You are SUNAI, a helpful AI assistant."},
                       {"role": "user",   "content": f"File content:\n\n{text}\n\nQuestion: {question}"}],
             max_tokens=1500)
