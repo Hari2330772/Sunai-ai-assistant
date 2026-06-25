@@ -2,587 +2,1793 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SUNAI — Free AI Assistant | Ask Anything</title>
 <meta name="description" content="SUNAI is a free AI assistant. Ask anything, upload images and files, get instant answers.">
-<meta name="keywords" content="SUNAI, AI assistant, free AI, chatbot, image analysis, file analysis">
-<meta property="og:title" content="SUNAI — Free AI Assistant">
-<meta property="og:description" content="Ask anything. Upload images & files. Get instant AI answers.">
+<meta name="keywords" content="SUNAI, AI assistant, free AI, chatbot India">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--sun:#FF6B00;--sun-l:#FF8C3A;--glow:rgba(255,107,0,0.18);--bg:#09090E;--s1:#111118;--s2:#18181F;--s3:#1E1E28;--border:rgba(255,255,255,0.07);--text:#EDEDF2;--muted:#5C5C72;--green:#22C55E;--red:#EF4444;}
-html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
-body{display:flex;flex-direction:column;overflow:hidden}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+:root {
+  --sun: #FF6B00;
+  --sun-light: #FF8C3A;
+  --sun-glow: rgba(255, 107, 0, 0.25);
+  --bg: #09090B;
+  --s1: #18181B;
+  --s2: #27272A;
+  --s3: #3F3F46;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(255, 107, 0, 0.3);
+  --text: #F4F4F5;
+  --muted: #A1A1AA;
+  --subtle: #71717A;
+  --green: #10B981;
+  --red: #EF4444;
+  --radius: 16px;
+  --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-/* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;border-bottom:.5px solid var(--border);background:var(--s1);flex-shrink:0}
-.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.orb{width:30px;height:30px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px var(--glow);animation:pulse 3s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 14px var(--glow)}50%{box-shadow:0 0 28px rgba(255,107,0,.4)}}
-.orb svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
-.logo-text{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700}
-.logo-text span{color:var(--sun)}
-.hright{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.plan-badge{font-size:11px;padding:2px 8px;border-radius:20px;border:.5px solid var(--border);color:var(--muted);background:var(--s2)}
-.plan-badge.pro{border-color:rgba(255,107,0,.4);color:var(--sun)}
-#user-name{font-size:12px;color:var(--muted)}
-.hbtn{font-size:12px;padding:5px 12px;border-radius:7px;border:.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
-.hbtn:hover{color:var(--text)}
-.hbtn.primary{background:var(--sun);color:white;border-color:var(--sun)}
-.hbtn.primary:hover{background:var(--sun-l)}
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow: hidden;
+}
 
-/* USAGE */
-#usage-bar{display:none;padding:5px 16px;background:var(--s2);border-bottom:.5px solid var(--border);flex-shrink:0}
-.usage-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;gap:8px}
-.usage-label{font-size:11px;color:var(--muted);white-space:nowrap}
-.bar-track{flex:1;height:3px;background:var(--s3);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;background:var(--sun);border-radius:3px;transition:width .4s}
-.bar-fill.danger{background:var(--red)}
-.usage-count{font-size:11px;color:var(--muted);white-space:nowrap}
-.up-mini{font-size:11px;padding:2px 8px;border-radius:12px;background:rgba(255,107,0,.1);border:.5px solid rgba(255,107,0,.3);color:var(--sun);cursor:pointer}
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
 
-/* SIDEBAR */
-.layout{display:flex;flex:1;overflow:hidden}
-#sidebar{width:220px;background:var(--s1);border-right:.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
-.sidebar-header{padding:12px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.sidebar-title{font-size:12px;font-weight:500;color:var(--muted)}
-.clear-btn{font-size:11px;padding:3px 8px;border-radius:6px;border:.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer}
-.clear-btn:hover{color:var(--red);border-color:var(--red)}
-#history-list{flex:1;overflow-y:auto;padding:8px}
-#history-list::-webkit-scrollbar{width:3px}
-#history-list::-webkit-scrollbar-thumb{background:var(--border)}
-.hist-item{font-size:12px;padding:7px 10px;border-radius:7px;color:var(--muted);cursor:pointer;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:.5px solid transparent}
-.hist-item:hover{background:var(--s2);color:var(--text);border-color:var(--border)}
-.hist-date{font-size:10px;color:var(--muted);padding:4px 10px;margin-top:6px}
-.no-history{font-size:12px;color:var(--muted);text-align:center;padding:20px 10px;line-height:1.6}
+/* ── HEADER ── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: rgba(9, 9, 11, 0.8);
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 10;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.orb {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sun), #FF3D00);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px var(--sun-glow);
+  position: relative;
+  overflow: hidden;
+}
+.orb::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%);
+  animation: rotateGlow 6s linear infinite;
+}
+@keyframes rotateGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.orb svg {
+  width: 16px;
+  height: 16px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  position: relative;
+  z-index: 2;
+}
+.logo-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.logo-name span {
+  color: var(--sun);
+}
+.hright {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.plan-pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 107, 0, 0.1);
+  color: var(--sun);
+  font-weight: 600;
+  border: 1px solid rgba(255, 107, 0, 0.25);
+  letter-spacing: 0.2px;
+}
+.plan-pill.free-pill {
+  background: var(--s1);
+  color: var(--muted);
+  border-color: var(--border);
+}
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: var(--transition);
+}
+.icon-btn:hover {
+  background: var(--s1);
+  color: var(--text);
+}
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
 
-/* MAIN */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#chat{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;scroll-behavior:smooth}
-#chat::-webkit-scrollbar{width:4px}
-#chat::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+/* ── SIDEBAR DRAWER ── */
+.drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 50;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+.drawer-overlay.open {
+  display: block;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.drawer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 300px;
+  background: #0D0D10;
+  z-index: 51;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+}
+.drawer.open {
+  transform: translateX(0);
+}
+.drawer-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.drawer-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.new-chat-btn {
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: var(--sun);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.new-chat-btn:hover {
+  background: var(--sun-light);
+  box-shadow: 0 4px 12px var(--sun-glow);
+}
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+.drawer-body::-webkit-scrollbar {
+  width: 4px;
+}
+.drawer-body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+.hist-date-label {
+  font-size: 11px;
+  color: var(--subtle);
+  padding: 10px 12px 6px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.hist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 3px;
+}
+.hist-item:hover {
+  background: var(--s1);
+}
+.hist-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.hist-item svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  flex-shrink: 0;
+}
+.hist-item span {
+  font-size: 13.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hist-item:hover span {
+  color: var(--text);
+}
+.hist-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--subtle);
+  cursor: pointer;
+  display: none;
+  padding: 2px;
+  border-radius: 4px;
+}
+.hist-item:hover .hist-delete-btn {
+  display: flex;
+}
+.hist-delete-btn:hover {
+  color: var(--red);
+  background: rgba(239, 68, 68, 0.1);
+}
+.drawer-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: #09090B;
+}
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sun), var(--sun-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(255, 107, 0, 0.2);
+}
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+.user-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-plan {
+  font-size: 11px;
+  color: var(--muted);
+}
+.logout-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.logout-btn:hover {
+  color: var(--red);
+  background: rgba(239, 68, 68, 0.1);
+}
 
-/* WELCOME */
-#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:24px;text-align:center;gap:14px}
-.sun-hero{width:60px;height:60px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px var(--glow);animation:pulse 3s ease-in-out infinite}
-.sun-hero svg{width:30px;height:30px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
-#welcome h1{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
-#welcome h1 span{color:var(--sun)}
-#welcome p{font-size:13px;color:var(--muted);max-width:300px;line-height:1.7}
-.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
-.chip{font-size:11px;padding:6px 12px;border-radius:16px;border:.5px solid var(--border);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .2s}
-.chip:hover{border-color:rgba(255,107,0,.5);color:var(--sun)}
+/* ── CHAT ENGINE ── */
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0 24px;
+  scroll-behavior: smooth;
+}
+#chat::-webkit-scrollbar {
+  width: 6px;
+}
+#chat::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
 
-/* MESSAGES */
-.mw{padding:4px 0;animation:up .2s ease}
-@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.mi{max-width:700px;margin:0 auto;padding:0 16px;display:flex;gap:10px;align-items:flex-start}
-.mw.user .mi{flex-direction:row-reverse}
-.av{width:27px;height:27px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;font-size:11px;font-weight:600}
-.av.aav{background:var(--sun);box-shadow:0 0 8px var(--glow)}
-.av.aav svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round}
-.av.uav{background:var(--s3);border:.5px solid var(--border);color:var(--muted)}
-.bub{max-width:82%;padding:10px 14px;border-radius:13px;font-size:13.5px;line-height:1.7}
-.mw.ai .bub{background:var(--s1);border:.5px solid var(--border);border-radius:3px 13px 13px 13px}
-.mw.user .bub{background:var(--s2);border:.5px solid rgba(255,107,0,.15);border-radius:13px 3px 13px 13px}
-.bub p{margin-bottom:6px}.bub p:last-child{margin:0}
-.bub strong{color:var(--sun-l);font-weight:500}
-.bub code{background:var(--s3);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;color:#86EFAC}
-.bub pre{background:var(--s3);padding:10px 12px;border-radius:8px;font-size:12px;overflow-x:auto;margin:6px 0;border:.5px solid var(--border);font-family:monospace}
-.img-preview{max-width:200px;border-radius:8px;margin-bottom:6px;border:.5px solid var(--border)}
-.typing{display:flex;gap:4px;align-items:center;padding:2px 0}
-.dot{width:5px;height:5px;background:var(--sun);border-radius:50%;animation:bop 1.2s ease-in-out infinite}
-.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-@keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+/* ── WELCOME & DISCOVERY ── */
+#welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 24px 20px;
+  text-align: center;
+  gap: 16px;
+}
+.sun-hero {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sun), #FF5000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 32px var(--sun-glow);
+  margin-bottom: 8px;
+}
+.sun-hero svg {
+  width: 32px;
+  height: 32px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.5;
+}
+#welcome h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.75px;
+}
+#welcome h1 span {
+  background: linear-gradient(135deg, var(--sun-light), var(--sun));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#welcome p {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 380px;
+  line-height: 1.6;
+}
+.suggestions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 14px;
+}
+@media (min-width: 500px) {
+  .suggestions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.sug-btn {
+  text-align: left;
+  padding: 14px 16px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sug-btn:hover {
+  background: var(--s2);
+  border-color: var(--border-active);
+  transform: translateY(-1px);
+}
+.sug-title {
+  font-weight: 600;
+  color: var(--text);
+}
+.sug-desc {
+  font-size: 11px;
+  color: var(--subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.sug-desc svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--subtle);
+  fill: none;
+  stroke-width: 2;
+  transition: var(--transition);
+}
+.sug-btn:hover svg {
+  stroke: var(--sun);
+  transform: translateX(2px);
+}
 
-/* INPUT */
-.inp-wrap{padding:10px 16px 14px;border-top:.5px solid var(--border);background:var(--s1);flex-shrink:0}
-.inp-box{max-width:700px;margin:0 auto}
+/* ── MESSAGES BUBBLES ── */
+.msg-group {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg-group.user {
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+}
+.msg-group.ai {
+  background: rgba(24, 24, 27, 0.3);
+  display: flex;
+  justify-content: flex-start;
+  gap: 16px;
+}
+.ai-av {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--sun);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(255, 107, 0, 0.15);
+}
+.ai-av svg {
+  width: 16px;
+  height: 16px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.5;
+}
+.bubble {
+  max-width: 85%;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.msg-group.user .bubble {
+  background: var(--s1);
+  padding: 12px 18px;
+  border-radius: 18px 18px 4px 18px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.msg-group.ai .bubble {
+  color: var(--text);
+  width: 100%;
+}
 
-/* File/Image preview bar */
-#attach-preview{display:none;background:var(--s2);border:.5px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--muted);align-items:center;gap:8px}
-#attach-preview span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#attach-preview img{width:40px;height:40px;object-fit:cover;border-radius:6px}
-#remove-attach{cursor:pointer;color:var(--red);font-size:16px;flex-shrink:0}
+/* Markdown parsing typography styling */
+.markdown-payload p {
+  margin-bottom: 12px;
+}
+.markdown-payload p:last-child {
+  margin-bottom: 0;
+}
+.markdown-payload strong {
+  color: var(--sun-light);
+  font-weight: 600;
+}
+.markdown-payload ul, .markdown-payload ol {
+  margin: 8px 0 16px 20px;
+}
+.markdown-payload li {
+  margin-bottom: 6px;
+}
+.markdown-payload code {
+  background: rgba(255, 107, 0, 0.1);
+  color: #FF8C3A;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+.code-block-container {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #09090B;
+  overflow: hidden;
+  margin: 14px 0;
+}
+.code-block-header {
+  background: #121214;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+}
+.copy-code-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+.copy-code-btn:hover {
+  color: var(--text);
+}
+.markdown-payload pre {
+  padding: 14px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ECECEF;
+}
 
-.inp-row{display:flex;gap:8px;align-items:flex-end;background:var(--s2);border:.5px solid var(--border);border-radius:12px;padding:8px 10px;transition:border-color .2s}
-.inp-row:focus-within{border-color:rgba(255,107,0,.4);box-shadow:0 0 0 3px rgba(255,107,0,.05)}
-.attach-btns{display:flex;gap:4px;flex-shrink:0}
-.att-btn{width:30px;height:30px;background:var(--s3);border:.5px solid var(--border);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-.att-btn:hover{border-color:rgba(255,107,0,.4);background:rgba(255,107,0,.08)}
-.att-btn svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
-.att-btn:hover svg{stroke:var(--sun)}
-textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;resize:none;max-height:100px;min-height:22px;line-height:1.6}
-textarea::placeholder{color:var(--muted)}
-.snd{width:32px;height:32px;background:var(--sun);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;box-shadow:0 0 10px var(--glow)}
-.snd:hover{background:var(--sun-l);transform:scale(1.06)}
-.snd:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
-.snd svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.hint{text-align:center;font-size:10px;color:var(--muted);margin-top:6px}
-input[type=file]{display:none}
+.img-preview {
+  max-width: 280px;
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  display: block;
+  border: 1px solid var(--border);
+}
 
-/* MODALS */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.overlay.show{display:flex}
-.modal{background:var(--s1);border:.5px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:360px;animation:up .2s ease}
-.modal h2{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:3px}
-.modal h2 span{color:var(--sun)}
-.modal p{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6}
-.field{margin-bottom:11px}
-.field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
-.field input{width:100%;background:var(--s2);border:.5px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
-.field input:focus{border-color:rgba(255,107,0,.4)}
-.mbtn{width:100%;padding:10px;border-radius:9px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;margin-top:3px}
-.mbtn.sun{background:var(--sun);color:white;box-shadow:0 0 12px var(--glow)}
-.mbtn.sun:hover{background:var(--sun-l)}
-.mbtn.ghost{background:var(--s2);color:var(--muted);border:.5px solid var(--border);margin-top:6px}
-.mbtn.ghost:hover{color:var(--text)}
-.merr{font-size:11px;color:var(--red);margin-top:6px;text-align:center;min-height:14px}
-.mtab{display:flex;gap:0;margin-bottom:16px;background:var(--s2);border-radius:8px;padding:3px}
-.mtab button{flex:1;padding:6px;border:none;border-radius:6px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .2s}
-.mtab button.active{background:var(--s1);color:var(--text)}
-.switch{font-size:11px;color:var(--muted);text-align:center;margin-top:10px}
-.switch a{color:var(--sun);cursor:pointer}
-.plan-card{background:var(--s2);border:.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
-.plan-card.featured{border-color:rgba(255,107,0,.4);background:rgba(255,107,0,.04)}
-.plan-name{font-size:12px;font-weight:600;margin-bottom:3px}
-.plan-price{font-size:20px;font-weight:700;font-family:'Space Grotesk',sans-serif}
-.plan-price span{font-size:12px;font-weight:400;color:var(--muted)}
-.plan-feat{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.8;list-style:none}
-.plan-feat li::before{content:"✓ ";color:var(--green)}
+/* Typing Indicator Animation */
+.typing {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 4px;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  background: var(--muted);
+  border-radius: 50%;
+  animation: bop 1.4s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bop {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
 
-/* Mobile sidebar toggle */
-#mob-sidebar-btn{display:none;background:transparent;border:none;cursor:pointer;padding:4px}
-@media(max-width:600px){
-  #sidebar{display:none;position:fixed;inset:0;z-index:150;width:100%}
-  #sidebar.open{display:flex}
-  #mob-sidebar-btn{display:block}
-  .hbtn span{display:none}
+/* ── ATTACHMENT PREVIEW STRIP ── */
+#attach-bar {
+  display: none;
+  padding: 8px 20px 0;
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.attach-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 14px;
+  max-width: 100%;
+}
+.attach-chip img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+.attach-chip .file-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 107, 0, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 107, 0, 0.15);
+}
+.attach-chip .file-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--sun);
+  fill: none;
+  stroke-width: 2;
+}
+.attach-chip .attach-info {
+  flex: 1;
+  min-width: 0;
+}
+.attach-chip .attach-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+.attach-chip .attach-type {
+  font-size: 11px;
+  color: var(--subtle);
+}
+.attach-chip .remove-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--s2);
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.attach-chip .remove-btn:hover {
+  background: var(--s3);
+  color: var(--text);
+}
+
+/* ── INPUT SYSTEM AREA ── */
+.input-area {
+  padding: 10px 20px 24px;
+  flex-shrink: 0;
+}
+.input-box {
+  background: var(--s1);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.input-box:focus-within {
+  border-color: var(--border-active);
+  box-shadow: 0 4px 24px rgba(255, 107, 0, 0.08);
+}
+.input-top {
+  display: flex;
+  align-items: flex-end;
+  padding: 12px 14px;
+  gap: 12px;
+}
+textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  resize: none;
+  max-height: 140px;
+  min-height: 24px;
+  line-height: 1.5;
+  padding: 0;
+}
+textarea::placeholder {
+  color: var(--subtle);
+}
+.send-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--sun);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition);
+  box-shadow: 0 0 10px var(--sun-glow);
+}
+.send-btn:hover {
+  background: var(--sun-light);
+  transform: scale(1.05);
+}
+.send-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.send-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.5;
+}
+.input-bottom {
+  display: flex;
+  align-items: center;
+  padding: 0 12px 12px;
+  gap: 6px;
+}
+.att-btn {
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: var(--transition);
+  color: var(--muted);
+}
+.att-btn:hover {
+  background: var(--s2);
+  color: var(--text);
+}
+.att-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+.input-hint {
+  flex: 1;
+  text-align: right;
+  font-size: 11px;
+  color: var(--subtle);
+  padding-right: 6px;
+}
+input[type=file] {
+  display: none;
+}
+
+/* ── DAILY USAGE INDICATOR ── */
+.usage-strip {
+  padding: 8px 20px 4px;
+  display: none;
+}
+.usage-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(24, 24, 27, 0.5);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+.usage-label {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.ubar {
+  flex: 1;
+  height: 4px;
+  background: var(--s2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ubar-fill {
+  height: 100%;
+  background: var(--sun);
+  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ubar-fill.warn {
+  background: var(--red);
+}
+.usage-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+.up-chip {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 107, 0, 0.15);
+  color: var(--sun-light);
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.up-chip:hover {
+  background: var(--sun);
+  color: white;
+}
+
+/* ── DIALOG SYSTEM MODALS ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  padding: 16px;
+}
+.overlay.show {
+  display: flex;
+}
+.modal {
+  background: #0E0E11;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 24px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalScaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-handle {
+  display: none;
+}
+@media (max-width: 480px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal {
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 36px;
+    animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .modal-handle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--s3);
+    border-radius: 4px;
+    margin: -12px auto 20px;
+  }
+}
+@keyframes slideUpModal {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.modal h2 span {
+  color: var(--sun);
+}
+.modal-sub {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.mtab {
+  display: flex;
+  background: var(--s1);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.mtab button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+}
+.mtab button.active {
+  background: var(--s2);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.field input {
+  width: 100%;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 14.5px;
+  outline: none;
+  transition: var(--transition);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.field input:focus {
+  border-color: var(--sun);
+  background: #121215;
+}
+.merr {
+  font-size: 12.5px;
+  color: var(--red);
+  min-height: 18px;
+  text-align: center;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.mbtn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.mbtn.primary {
+  background: var(--sun);
+  color: white;
+  box-shadow: 0 4px 16px var(--sun-glow);
+}
+.mbtn.primary:hover {
+  background: var(--sun-light);
+  transform: translateY(-1px);
+}
+.mbtn.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  margin-top: 8px;
+}
+.mbtn.ghost:hover {
+  background: var(--s1);
+  color: var(--text);
+}
+.switch-text {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 16px;
+}
+.switch-text a {
+  color: var(--sun-light);
+  cursor: pointer;
+  font-weight: 600;
+}
+.switch-text a:hover {
+  text-decoration: underline;
+}
+
+/* ── PLAN MATRIX CARDS ── */
+.plan-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (min-width: 400px) {
+  .plan-row {
+    flex-direction: row;
+  }
+}
+.plan-card {
+  flex: 1;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.plan-card.active-plan {
+  border-color: var(--sun);
+  background: rgba(255, 107, 0, 0.04);
+}
+.plan-card .plan-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.plan-card.active-plan .plan-name {
+  color: var(--sun-light);
+}
+.plan-card .plan-price {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+.plan-card .plan-price span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.plan-card ul {
+  font-size: 12px;
+  color: var(--muted);
+  list-style: none;
+  margin-top: 12px;
+}
+.plan-card ul li {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.plan-card ul li::before {
+  content: "✓";
+  color: var(--green);
+  font-weight: bold;
+}
+
+/* Toast Messages UI component */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #18181B;
+  color: #FFFFFF;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  font-size: 13.5px;
+  font-weight: 500;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+.toast-container.show {
+  transform: translate(-50%, -10px);
+  opacity: 1;
 }
 </style>
 </head>
 <body>
 
+<!-- DRAWER BACKGROUND -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- SIDEBAR DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <span class="drawer-title">History</span>
+    <button class="new-chat-btn" onclick="newChat()">+ New</button>
+  </div>
+  <div class="drawer-body" id="hist-body">
+    <div style="font-size:13.5px;color:var(--muted);text-align:center;padding:32px 16px;line-height:1.7">Sign in to save<br>conversations permanently.</div>
+  </div>
+  <div class="drawer-footer" id="drawer-footer" style="display:none">
+    <div class="user-row">
+      <div class="user-avatar" id="drawer-av">S</div>
+      <div class="user-info">
+        <div class="user-name" id="drawer-name">User</div>
+        <div class="user-plan" id="drawer-plan">Free account</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
 <header>
   <div style="display:flex;align-items:center;gap:8px">
-    <button id="mob-sidebar-btn" onclick="toggleSidebar()" aria-label="History">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <button class="icon-btn" onclick="openDrawer()" aria-label="Open History Drawer">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
-    <a class="logo" href="/">
-      <div class="orb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
-      <span class="logo-text">SUN<span>AI</span></span>
-    </a>
+    <div class="logo">
+      <div class="orb">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </div>
+      <span class="logo-name">SUN<span>AI</span></span>
+    </div>
   </div>
   <div class="hright">
-    <span id="plan-badge" class="plan-badge" style="display:none"></span>
-    <span id="user-name" style="display:none"></span>
-    <button class="hbtn primary" id="btn-upgrade" style="display:none" onclick="openUpgrade()">⚡ Pro</button>
-    <button class="hbtn" id="btn-login" onclick="openAuth('login')">Login</button>
-    <button class="hbtn primary" id="btn-signup" onclick="openAuth('signup')">Sign Up Free</button>
-    <button class="hbtn" id="btn-logout" style="display:none" onclick="logout()">Logout</button>
+    <span id="plan-pill" class="plan-pill free-pill" style="display:none"></span>
+    <button class="icon-btn" id="btn-login" onclick="openAuth('login')" style="width:auto;padding:0 14px;border-radius:10px;font-size:13px;color:var(--muted);font-weight:600">Login</button>
+    <button class="icon-btn" id="btn-signup" onclick="openAuth('signup')" style="width:auto;padding:0 14px;border-radius:10px;font-size:13px;background:var(--sun);color:white;font-weight:600">Sign Up</button>
+    <button class="icon-btn" id="btn-upgrade" style="display:none;width:auto;padding:0 14px;border-radius:10px;font-size:13px;background:rgba(255,107,0,0.15);color:var(--sun-light);font-weight:600" onclick="openUpgrade()">⚡ Upgrade</button>
   </div>
 </header>
 
-<div id="usage-bar">
-  <div class="usage-inner">
-    <span class="usage-label">Queries today</span>
-    <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
-    <span class="usage-count" id="usage-count"></span>
-    <span class="up-mini" onclick="openUpgrade()">Upgrade ↑</span>
+<!-- USAGE TRACKER BAR -->
+<div class="usage-strip" id="usage-strip">
+  <div class="usage-row">
+    <span class="usage-label">Daily queries</span>
+    <div class="ubar"><div class="ubar-fill" id="ubar-fill"></div></div>
+    <span class="usage-num" id="usage-num">0/10</span>
+    <span class="up-chip" onclick="openUpgrade()">Upgrade</span>
   </div>
 </div>
 
-<div class="layout">
-  <!-- SIDEBAR: Chat History -->
-  <div id="sidebar">
-    <div class="sidebar-header">
-      <span class="sidebar-title">💬 Chat History</span>
-      <button class="clear-btn" onclick="clearHistory()">Clear all</button>
+<!-- MAIN CHAT FLOW PANEL -->
+<div id="chat">
+  <div id="welcome">
+    <div class="sun-hero">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
     </div>
-    <div id="history-list">
-      <div class="no-history">Sign in to see your chat history</div>
-    </div>
-  </div>
-
-  <div class="main">
-    <div id="chat">
-      <div id="welcome">
-        <div class="sun-hero"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
-        <h1>Ask anything to <span>SUNAI</span></h1>
-        <p>Free AI assistant — chat, upload images & files, get instant answers!</p>
-        <div class="chips">
-          <div class="chip" onclick="q('What is machine learning?')">What is machine learning?</div>
-          <div class="chip" onclick="q('Write a Python hello world')">Python hello world</div>
-          <div class="chip" onclick="q('How to get a data science job?')">Data science career</div>
-          <div class="chip" onclick="q('Explain neural networks simply')">Neural networks</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="inp-wrap">
-      <div class="inp-box">
-        <div id="attach-preview">
-          <img id="preview-img" style="display:none">
-          <svg id="preview-file-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" style="display:none;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span id="attach-name"></span>
-          <span id="remove-attach" onclick="removeAttach()">✕</span>
-        </div>
-        <div class="inp-row">
-          <div class="attach-btns">
-            <button class="att-btn" onclick="document.getElementById('img-input').click()" title="Upload image">
-              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </button>
-            <button class="att-btn" onclick="document.getElementById('file-input').click()" title="Upload file">
-              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </button>
-          </div>
-          <textarea id="inp" rows="1" placeholder="Ask SUNAI anything… or upload an image/file" onkeydown="onKey(event)" oninput="grow(this)"></textarea>
-          <button class="snd" id="snd" onclick="send()" aria-label="Send">
-            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-        </div>
-        <div class="hint">SUNAI · Enter to send · 📎 image & file upload supported</div>
-      </div>
+    <h1>Ask anything to <span>SUNAI</span></h1>
+    <p>Your ultimate free AI assistant optimized for coding architecture, logical science, career development, and document translations.</p>
+    
+    <div class="suggestions">
+      <button class="sug-btn" onclick="q('What is machine learning and how does it work?')">
+        <span class="sug-title">What is machine learning?</span>
+        <span class="sug-desc">A conceptual explanation of core methodologies.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </button>
+      <button class="sug-btn" onclick="q('Write a Python binary search function with explanations')">
+        <span class="sug-title">Write Python Binary Search</span>
+        <span class="sug-desc">Get structured logic with complexities.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </button>
+      <button class="sug-btn" onclick="q('How do I structure a world-class system architect resume?')">
+        <span class="sug-title">Structure Architect Resume</span>
+        <span class="sug-desc">Get sections and layout structures.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </button>
+      <button class="sug-btn" onclick="q('Explain neural networks in simple words')">
+        <span class="sug-title">Neural Networks Explained</span>
+        <span class="sug-desc">Layman concepts and network models.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </button>
     </div>
   </div>
 </div>
 
-<input type="file" id="img-input" accept="image/*" onchange="attachImage(this)">
-<input type="file" id="file-input" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)">
+<!-- ATTACHMENT STRIP PREVIEW -->
+<div id="attach-bar">
+  <div class="attach-chip">
+    <img id="ap-img" style="display:none" alt="Attached preview element">
+    <div class="file-icon" id="ap-file-icon" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <div class="attach-info">
+      <div class="attach-name" id="ap-name">Document.pdf</div>
+      <div class="attach-type" id="ap-type">PDF File</div>
+    </div>
+    <button class="remove-btn" onclick="removeAttach()" aria-label="Remove attachment">×</button>
+  </div>
+</div>
 
-<!-- AUTH MODAL -->
+<!-- INPUT BAR FOOTER CONTAINER -->
+<div class="input-area">
+  <div class="input-box">
+    <div class="input-top">
+      <textarea id="inp" rows="1" placeholder="Ask SUNAI anything..." onkeydown="onKey(event)" oninput="grow(this)"></textarea>
+      <button class="send-btn" id="snd" onclick="send()" aria-label="Send Message">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-bottom">
+      <button class="att-btn" onclick="document.getElementById('img-inp').click()" title="Attach Image">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <button class="att-btn" onclick="document.getElementById('file-inp').click()" title="Attach Document Document">
+        <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <span class="input-hint">SUNAI Engine 2.5 · Enter to Send</span>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="img-inp" accept="image/*" onchange="attachImg(this)">
+<input type="file" id="file-inp" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)">
+
+<!-- THE TOAST NOTIFICATION CONTAINER -->
+<div class="toast-container" id="toast">Copied to Clipboard!</div>
+
+<!-- AUTHENTICATION SYSTEM INTERFACES -->
 <div class="overlay" id="auth-modal">
   <div class="modal">
+    <div class="modal-handle"></div>
     <div class="mtab">
-      <button id="tab-login" onclick="switchTab('login')">Login</button>
-      <button id="tab-signup" onclick="switchTab('signup')" class="active">Sign Up</button>
+      <button id="tab-signup" class="active" onclick="switchTab('signup')">Sign Up</button>
+      <button id="tab-login" onclick="switchTab('login')">Log In</button>
     </div>
-    <h2>Join <span>SUNAI</span></h2>
-    <p id="auth-sub">Create free account — 10 AI queries daily.</p>
-    <div class="field" id="name-field">
-      <label>Your Name</label>
-      <input type="text" id="a-name" placeholder="Enter your name">
-    </div>
+    <h2 id="auth-title">Create account</h2>
+    <p class="modal-sub" id="auth-sub">Unlock chat persistence, high-fidelity processing speeds, and maximum attachment analysis options.</p>
+    
     <div class="field">
-      <label>Email</label>
-      <input type="email" id="a-email" placeholder="you@email.com">
+      <label>Email address</label>
+      <input type="email" id="auth-email" placeholder="you@domain.com">
     </div>
     <div class="field">
       <label>Password</label>
-      <input type="password" id="a-pw" placeholder="Password">
+      <input type="password" id="auth-password" placeholder="••••••••">
     </div>
+    
     <div class="merr" id="auth-err"></div>
-    <button class="mbtn sun" id="auth-btn" onclick="submitAuth()">Create Free Account</button>
-    <button class="mbtn ghost" onclick="closeModal('auth-modal')">Cancel</button>
+    <button class="mbtn primary" id="auth-submit-btn" onclick="submitAuth()">Create Account</button>
+    <button class="mbtn ghost" onclick="closeAuth()">Cancel</button>
+    <div class="switch-text" id="auth-switch">Already have an account? <a onclick="switchTab('login')">Log in</a></div>
   </div>
 </div>
 
-<!-- UPGRADE MODAL -->
+<!-- PAYWALL / PREMIUM UPGRADE SYSTEM INTERFACES -->
 <div class="overlay" id="upgrade-modal">
   <div class="modal">
-    <h2>Upgrade to <span>Pro</span></h2>
-    <p>Unlock unlimited queries and priority responses.</p>
-    <div class="plan-card">
-      <div class="plan-name">Free Plan</div>
-      <div class="plan-price">₹0 <span>/month</span></div>
-      <ul class="plan-feat"><li>10 queries/day</li><li>Image & file upload</li><li>Chat history</li></ul>
+    <div class="modal-handle"></div>
+    <h2>Upgrade to <span>SUNAI Pro</span></h2>
+    <p class="modal-sub">Break barriers! Get limitless access with high fidelity performance and full context file parses.</p>
+    
+    <div class="plan-row">
+      <div class="plan-card" id="plan-card-free" onclick="selectPlan('free')">
+        <div class="plan-name">Free Plan</div>
+        <div class="plan-price">₹0<span>/mo</span></div>
+        <ul>
+          <li>10 queries daily</li>
+          <li>Standard AI Speed</li>
+          <li>Image attachments</li>
+        </ul>
+      </div>
+      <div class="plan-card active-plan" id="plan-card-pro" onclick="selectPlan('pro')">
+        <div class="plan-name">Pro Plan</div>
+        <div class="plan-price">₹199<span>/mo</span></div>
+        <ul>
+          <li>Unlimited queries</li>
+          <li>10x Generation Speed</li>
+          <li>Full document analysis</li>
+        </ul>
+      </div>
     </div>
-    <div class="plan-card featured">
-      <div class="plan-name" style="color:var(--sun)">⚡ Pro Plan</div>
-      <div class="plan-price">₹99 <span>/month</span></div>
-      <ul class="plan-feat"><li>Unlimited queries</li><li>Image & file upload</li><li>Full chat history</li><li>Priority support</li></ul>
-    </div>
-    <div class="merr" id="pay-err"></div>
-    <button class="mbtn sun" onclick="payNow()">Pay ₹99 with Razorpay</button>
-    <button class="mbtn ghost" onclick="closeModal('upgrade-modal')">Maybe later</button>
+    
+    <div class="merr" id="upgrade-err"></div>
+    <button class="mbtn primary" id="checkout-btn" onclick="checkoutPro()">Upgrade via UPI / Razorpay</button>
+    <button class="mbtn ghost" onclick="closeUpgrade()">Back to safety</button>
   </div>
 </div>
 
 <script>
-const chatEl = document.getElementById('chat');
-const inpEl  = document.getElementById('inp');
-const sndEl  = document.getElementById('snd');
-let history_msgs = [], busy = false, userData = null, authMode = 'signup';
-let attachedFile = null, attachedImage = null, attachedType = null;
+// ── SYSTEM CONFIGURATIONS & STATE MANAGEMENT ──
+let state = {
+  isLoggedIn: false,
+  user: null, 
+  currentChatId: null,
+  chats: {}, 
+  activeAttachment: null, 
+  authMode: 'signup',
+  isGenerating: false,
+  selectedUpgradePlan: 'pro'
+};
 
-function icon(){return`<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>`;}
+// DOM caching layers
+const chatContainer = document.getElementById('chat');
+const welcomeSection = document.getElementById('welcome');
+const inputField = document.getElementById('inp');
+const sendButton = document.getElementById('snd');
+const attachBar = document.getElementById('attach-bar');
+const apImg = document.getElementById('ap-img');
+const apFileIcon = document.getElementById('ap-file-icon');
+const apName = document.getElementById('ap-name');
+const apType = document.getElementById('ap-type');
+const imageInput = document.getElementById('img-inp');
+const fileInput = document.getElementById('file-inp');
 
-// ── INIT ──────────────────────────────────────────────────────────────────
-async function init(){
-  // Auto-fill email from localStorage
-  const savedEmail = localStorage.getItem('sunai_email');
-  if(savedEmail) document.getElementById('a-email').value = savedEmail;
+document.addEventListener("DOMContentLoaded", () => {
+  loadLocalState();
+  renderUserInterface();
+  newChat();
+});
 
-  try{
-    const r = await fetch('/me', {credentials:'include'}).then(x=>x.json());
-    if(r.name){
-      userData = r;
-      showLoggedIn(r);
-      loadHistory();
+function loadLocalState() {
+  try {
+    const savedUser = localStorage.getItem('sunai_user');
+    const savedChats = localStorage.getItem('sunai_chats');
+    if (savedUser) {
+      state.user = JSON.parse(savedUser);
+      state.isLoggedIn = true;
     }
-  }catch(e){}
-}
-init();
-
-function showLoggedIn(u){
-  document.getElementById('btn-login').style.display='none';
-  document.getElementById('btn-signup').style.display='none';
-  document.getElementById('btn-logout').style.display='block';
-  document.getElementById('user-name').style.display='block';
-  document.getElementById('user-name').textContent = u.name;
-  const pb = document.getElementById('plan-badge');
-  pb.style.display='block';
-  pb.textContent = u.plan==='pro'?'⚡ Pro':'Free';
-  if(u.plan==='pro') pb.classList.add('pro');
-  if(u.plan==='free'){
-    document.getElementById('btn-upgrade').style.display='block';
-    document.getElementById('usage-bar').style.display='block';
-    updateUsageBar(u);
+    if (savedChats) {
+      state.chats = JSON.parse(savedChats);
+    }
+  } catch (e) {
+    console.error("Local data layer loading issue:", e);
   }
 }
 
-function updateUsageBar(u){
-  const pct = (u.used_today/10)*100;
-  const fill = document.getElementById('bar-fill');
-  fill.style.width = pct+'%';
-  if(pct>=80) fill.classList.add('danger');
-  document.getElementById('usage-count').textContent = u.used_today+'/10';
-}
-
-// ── HISTORY ──────────────────────────────────────────────────────────────
-async function loadHistory(){
-  try{
-    const r = await fetch('/history',{credentials:'include'}).then(x=>x.json());
-    const list = document.getElementById('history-list');
-    if(!r.history || r.history.length===0){
-      list.innerHTML='<div class="no-history">No conversations yet.<br>Start chatting!</div>';
-      return;
+function saveState() {
+  try {
+    if (state.isLoggedIn && state.user) {
+      localStorage.setItem('sunai_user', JSON.stringify(state.user));
+    } else {
+      localStorage.removeItem('sunai_user');
     }
-    // Group by date
-    const grouped = {};
-    r.history.filter(m=>m.role==='user').forEach(m=>{
-      const d = m.time||'Today';
-      if(!grouped[d]) grouped[d]=[];
-      grouped[d].push(m.content);
-    });
-    list.innerHTML = Object.entries(grouped).reverse().map(([d,msgs])=>
-      `<div class="hist-date">${d}</div>` +
-      msgs.slice(-5).reverse().map(m=>
-        `<div class="hist-item" onclick="q('${m.replace(/'/g,"\\'").substring(0,60)}')" title="${m}">
-          💬 ${m.substring(0,40)}${m.length>40?'...':''}
-        </div>`
-      ).join('')
-    ).join('');
-  }catch(e){}
+    localStorage.setItem('sunai_chats', JSON.stringify(state.chats));
+  } catch (e) {
+    console.error("Data conservation fault:", e);
+  }
 }
 
-async function clearHistory(){
-  if(!confirm('Clear all chat history?')) return;
-  await fetch('/history/clear',{method:'POST',credentials:'include'});
-  document.getElementById('history-list').innerHTML='<div class="no-history">History cleared!</div>';
-}
+// ── RENDER CONTROLLERS ──
+function renderUserInterface() {
+  const btnLogin = document.getElementById('btn-login');
+  const btnSignup = document.getElementById('btn-signup');
+  const btnUpgrade = document.getElementById('btn-upgrade');
+  const planPill = document.getElementById('plan-pill');
+  const usageStrip = document.getElementById('usage-strip');
+  const histBody = document.getElementById('hist-body');
+  const drawerFooter = document.getElementById('drawer-footer');
 
-// ── ATTACH ──────────────────────────────────────────────────────────────
-function attachImage(input){
-  const file = input.files[0];
-  if(!file) return;
-  attachedImage = file;
-  attachedType = 'image';
-  const preview = document.getElementById('attach-preview');
-  const img = document.getElementById('preview-img');
-  const fileIcon = document.getElementById('preview-file-icon');
-  img.src = URL.createObjectURL(file);
-  img.style.display='block';
-  fileIcon.style.display='none';
-  document.getElementById('attach-name').textContent = file.name;
-  preview.style.display='flex';
-  input.value='';
-}
+  if (state.isLoggedIn && state.user) {
+    btnLogin.style.display = 'none';
+    btnSignup.style.display = 'none';
+    
+    planPill.style.display = 'inline-block';
+    planPill.innerText = state.user.plan === 'pro' ? '⚡ Pro' : 'Free';
+    planPill.className = `plan-pill ${state.user.plan}-pill`;
+    
+    btnUpgrade.style.display = state.user.plan === 'pro' ? 'none' : 'inline-block';
+    usageStrip.style.display = 'block';
+    
+    const limit = state.user.plan === 'pro' ? '∞' : state.user.limit;
+    const used = state.user.used || 0;
+    document.getElementById('usage-num').innerText = `${used}/${limit}`;
+    const percent = state.user.plan === 'pro' ? 0 : Math.min(100, (used / state.user.limit) * 100);
+    const ubarFill = document.getElementById('ubar-fill');
+    ubarFill.style.width = `${percent}%`;
+    if (percent >= 80) ubarFill.classList.add('warn');
+    else ubarFill.classList.remove('warn');
 
-function attachFile(input){
-  const file = input.files[0];
-  if(!file) return;
-  attachedFile = file;
-  attachedType = 'file';
-  const preview = document.getElementById('attach-preview');
-  document.getElementById('preview-img').style.display='none';
-  document.getElementById('preview-file-icon').style.display='block';
-  document.getElementById('attach-name').textContent = file.name;
-  preview.style.display='flex';
-  input.value='';
-}
+    drawerFooter.style.display = 'block';
+    document.getElementById('drawer-name').innerText = state.user.email.split('@')[0];
+    document.getElementById('drawer-plan').innerText = state.user.plan === 'pro' ? 'Pro Member' : 'Free Tier';
+    document.getElementById('drawer-av').innerText = state.user.email.charAt(0).toUpperCase();
 
-function removeAttach(){
-  attachedFile = attachedImage = attachedType = null;
-  document.getElementById('attach-preview').style.display='none';
-  document.getElementById('preview-img').src='';
-}
-
-// ── MESSAGES ──────────────────────────────────────────────────────────────
-function addMsg(role, html){
-  const w = document.createElement('div');
-  w.className = `mw ${role}`;
-  w.innerHTML = role==='ai'
-    ? `<div class="mi"><div class="av aav">${icon()}</div><div class="bub">${html}</div></div>`
-    : `<div class="mi"><div class="av uav">U</div><div class="bub">${html}</div></div>`;
-  chatEl.appendChild(w);
-  chatEl.scrollTop=99999;
-  return w;
-}
-
-function fmt(t){
-  t=t.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${c.trim()}</code></pre>`);
-  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
-  t=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
-  t=t.replace(/^#{1,3} (.+)$/gm,'<strong>$1</strong>');
-  t=t.replace(/^- (.+)$/gm,'• $1');
-  return t.split('\n\n').filter(p=>p.trim()).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
-}
-
-// ── SEND ──────────────────────────────────────────────────────────────────
-async function send(){
-  const txt = inpEl.value.trim();
-  if((!txt && !attachedType) || busy) return;
-  if(!userData){ openAuth('signup'); return; }
-
-  document.getElementById('welcome')?.remove();
-  inpEl.value=''; grow(inpEl);
-  busy=true; sndEl.disabled=true;
-
-  if(attachedType==='image' && attachedImage){
-    const imgUrl = document.getElementById('preview-img').src;
-    addMsg('user',`${txt?`<p>${txt.replace(/</g,'&lt;')}</p>`:''}<img src="${imgUrl}" class="img-preview">`);
-    removeAttach();
-    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
-    const fd = new FormData();
-    fd.append('image', attachedImage || document.getElementById('img-input').files[0]);
-    fd.append('question', txt || 'Describe this image in detail.');
-    try{
-      const res = await fetch('/analyze-image',{method:'POST',body:fd,credentials:'include'});
-      const data = await res.json();
-      tw.querySelector('.bub').innerHTML = data.error ? `<p style="color:var(--red)">${data.error}</p>` : fmt(data.reply);
-    }catch(e){tw.querySelector('.bub').innerHTML='<p>Error. Try again.</p>';}
-  } else if(attachedType==='file' && attachedFile){
-    const fname = attachedFile.name;
-    addMsg('user',`<p>📄 <strong>${fname}</strong>${txt?'<br>'+txt.replace(/</g,'&lt;'):''}</p>`);
-    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
-    const fd = new FormData();
-    fd.append('file', attachedFile);
-    fd.append('question', txt || 'Summarize this document.');
-    removeAttach();
-    try{
-      const res = await fetch('/analyze-file',{method:'POST',body:fd,credentials:'include'});
-      const data = await res.json();
-      tw.querySelector('.bub').innerHTML = data.error ? `<p style="color:var(--red)">${data.error}</p>` : fmt(data.reply);
-    }catch(e){tw.querySelector('.bub').innerHTML='<p>Error. Try again.</p>';}
+    renderHistory();
   } else {
-    addMsg('user',`<p>${txt.replace(/</g,'&lt;')}</p>`);
-    history_msgs.push({role:'user',content:txt});
-    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
-    try{
-      const res = await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({messages:history_msgs})});
-      const data = await res.json();
-      if(data.error==='limit_reached'){
-        tw.querySelector('.bub').innerHTML=`<p>${data.message} <strong onclick="openUpgrade()" style="color:var(--sun);cursor:pointer">Upgrade ↗</strong></p>`;
-        history_msgs.pop();
-      } else if(data.reply){
-        history_msgs.push({role:'assistant',content:data.reply});
-        tw.querySelector('.bub').innerHTML=fmt(data.reply);
-        if(data.remaining!==undefined && userData?.plan==='free'){
-          userData.used_today = 10-data.remaining;
-          updateUsageBar(userData);
-        }
-        loadHistory();
-      } else {
-        tw.querySelector('.bub').innerHTML=`<p style="color:var(--red)">${data.error||'Something went wrong.'}</p>`;
-        history_msgs.pop();
-      }
-    }catch(e){tw.querySelector('.bub').innerHTML='<p>Connection error.</p>';history_msgs.pop();}
+    btnLogin.style.display = 'inline-block';
+    btnSignup.style.display = 'inline-block';
+    btnUpgrade.style.display = 'none';
+    planPill.style.display = 'none';
+    usageStrip.style.display = 'none';
+    drawerFooter.style.display = 'none';
+    histBody.innerHTML = `<div style="font-size:13.5px;color:var(--muted);text-align:center;padding:32px 16px;line-height:1.7">Sign in to save<br>conversations permanently.</div>`;
+  }
+}
+
+function renderHistory() {
+  const histBody = document.getElementById('hist-body');
+  const keys = Object.keys(state.chats);
+  if (keys.length === 0) {
+    histBody.innerHTML = `<div style="font-size:12.5px;color:var(--subtle);text-align:center;padding:20px">No recent chats.</div>`;
+    return;
+  }
+  
+  let html = `<div class="hist-date-label">Recent Conversations</div>`;
+  keys.sort((a,b) => b.split('_')[1] - a.split('_')[1]).forEach(id => {
+    const chat = state.chats[id];
+    html += `
+      <div class="hist-item" id="hist-${id}">
+        <div class="hist-item-left" onclick="switchChat('${id}')">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span title="${escapeHtml(chat.title)}">${escapeHtml(chat.title)}</span>
+        </div>
+        <button class="hist-delete-btn" onclick="deleteChat(event, '${id}')" title="Delete conversation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>`;
+  });
+  histBody.innerHTML = html;
+  
+  if (state.currentChatId) {
+    const activeItem = document.getElementById(`hist-${state.currentChatId}`);
+    if (activeItem) activeItem.style.background = 'var(--s1)';
+  }
+}
+
+// ── UTILITY ACTION CALLS ──
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+function newChat() {
+  state.currentChatId = null;
+  chatContainer.innerHTML = `
+    <div id="welcome">
+      <div class="sun-hero">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </div>
+      <h1>Ask anything to <span>SUNAI</span></h1>
+      <p>Your ultimate free AI assistant optimized for coding architecture, logical science, career development, and document translations.</p>
+      
+      <div class="suggestions">
+        <button class="sug-btn" onclick="q('What is machine learning and how does it work?')">
+          <span class="sug-title">What is machine learning?</span>
+          <span class="sug-desc">A conceptual explanation of core methodologies.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </button>
+        <button class="sug-btn" onclick="q('Write a Python binary search function with explanations')">
+          <span class="sug-title">Write Python Binary Search</span>
+          <span class="sug-desc">Get structured logic with complexities.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </button>
+        <button class="sug-btn" onclick="q('How do I structure a world-class system architect resume?')">
+          <span class="sug-title">Structure Architect Resume</span>
+          <span class="sug-desc">Get sections and layout structures.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </button>
+        <button class="sug-btn" onclick="q('Explain neural networks in simple words')">
+          <span class="sug-title">Neural Networks Explained</span>
+          <span class="sug-desc">Layman concepts and network models.<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </button>
+      </div>
+    </div>`;
+  closeDrawer();
+}
+
+function switchChat(id) {
+  if (!state.chats[id]) return;
+  state.currentChatId = id;
+  chatContainer.innerHTML = '';
+  state.chats[id].messages.forEach(msg => {
+    appendMessageElement(msg.role, msg.content, msg.attachment);
+  });
+  closeDrawer();
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  renderHistory();
+}
+
+function deleteChat(event, id) {
+  event.stopPropagation();
+  if (confirm("Are you sure you want to delete this chat session?")) {
+    delete state.chats[id];
+    if (state.currentChatId === id) {
+      newChat();
+    }
+    saveState();
+    renderHistory();
+  }
+}
+
+function q(text) {
+  inputField.value = text;
+  grow(inputField);
+  send();
+}
+
+// ── ATTACHMENT PIPELINE ──
+function attachImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  if (file.size > 5 * 1024 * 1024) {
+    showToast("Images are limited to 5MB.");
+    input.value = '';
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    state.activeAttachment = { type: 'image', base64: e.target.result, name: file.name, fileType: file.type };
+    apFileIcon.style.display = 'none';
+    apImg.style.display = 'block';
+    apImg.src = e.target.result;
+    apName.innerText = file.name;
+    apType.innerText = 'Image Component';
+    attachBar.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function attachFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (file.size > 10 * 1024 * 1024) {
+    showToast("Documents are limited to 10MB.");
+    input.value = '';
+    return;
   }
 
-  busy=false; sndEl.disabled=false;
-  chatEl.scrollTop=99999;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    state.activeAttachment = { type: 'file', base64: e.target.result, name: file.name, fileType: file.type };
+    apImg.style.display = 'none';
+    apFileIcon.style.display = 'flex';
+    apName.innerText = file.name;
+    apType.innerText = file.name.split('.').pop().toUpperCase() + ' File';
+    attachBar.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
 }
 
-function q(txt){inpEl.value=txt; send();}
-function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
-function grow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
-
-// ── AUTH ──────────────────────────────────────────────────────────────────
-function openAuth(mode){
-  authMode=mode; switchTab(mode);
-  // Pre-fill email from localStorage
-  const saved = localStorage.getItem('sunai_email');
-  if(saved) document.getElementById('a-email').value=saved;
-  document.getElementById('auth-modal').classList.add('show');
-}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-
-function switchTab(mode){
-  authMode=mode;
-  document.getElementById('tab-login').classList.toggle('active',mode==='login');
-  document.getElementById('tab-signup').classList.toggle('active',mode==='signup');
-  document.getElementById('name-field').style.display=mode==='signup'?'block':'none';
-  document.getElementById('auth-sub').textContent=mode==='signup'?'Create free account — 10 AI queries daily.':'Welcome back!';
-  document.getElementById('auth-btn').textContent=mode==='signup'?'Create Free Account':'Login';
-  document.getElementById('auth-err').textContent='';
+function removeAttach() {
+  state.activeAttachment = null;
+  attachBar.style.display = 'none';
+  imageInput.value = '';
+  fileInput.value = '';
 }
 
-async function submitAuth(){
-  const name=document.getElementById('a-name').value.trim();
-  const email=document.getElementById('a-email').value.trim();
-  const pw=document.getElementById('a-pw').value;
-  const err=document.getElementById('auth-err');
-  if(authMode==='signup'&&!name){err.textContent='Name required';return;}
-  if(!email||!pw){err.textContent='Email and password required';return;}
-
-  const endpoint = authMode==='signup'?'/register':'/login';
-  const body = authMode==='signup'?{name,email,password:pw}:{email,password:pw};
-  const res = await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
-  const data = await res.json();
-  if(data.error){err.textContent=data.error;return;}
-
-  // Save email to localStorage for auto-fill next time
-  localStorage.setItem('sunai_email', email);
-
-  userData={name:data.name,plan:data.plan,used_today:0};
-  showLoggedIn(userData);
-  closeModal('auth-modal');
-  loadHistory();
-  const me = await fetch('/me',{credentials:'include'}).then(x=>x.json());
-  if(me.name){userData=me;if(me.plan==='free')updateUsageBar(me);}
+// ── INTERACTIVE MUTATION DYNAMICS ──
+function grow(element) {
+  element.style.height = "auto";
+  element.style.height = (element.scrollHeight - 4) + "px";
 }
 
-async function logout(){
-  localStorage.removeItem('sunai_email');
-  await fetch('/logout',{credentials:'include'});
-  location.reload();
+function onKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
 }
 
-// ── UPGRADE ──────────────────────────────────────────────────────────────
-function openUpgrade(){document.getElementById('upgrade-modal').classList.add('show');}
+// ── TEXT PROCESSORS / PARSER ──
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 
-async function payNow(){
-  const err=document.getElementById('pay-err');
-  err.textContent='Processing...';
-  err.style.color='var(--muted)';
-  setTimeout(async()=>{
-    const res=await fetch('/upgrade',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({payment_id:'demo_'+Date.now()})});
-    const data=await res.json();
-    if(data.success){
-      err.style.color='var(--green)';
-      err.textContent='✓ Upgraded to Pro!';
-      setTimeout(()=>{closeModal('upgrade-modal');location.reload();},1500);
+function formatMarkdown(src) {
+  if (!src) return '';
+  let txt = escapeHtml(src);
+  
+  // High fidelity parsing maps for multi line preformatted sections
+  const codeBlockRegex = /```(.*?)\n([\s\S]*?)```/g;
+  let hasBlock = codeBlockRegex.test(txt);
+  
+  if (hasBlock) {
+    txt = txt.replace(codeBlockRegex, (match, lang, code) => {
+      const cleanLang = lang.trim() || 'code';
+      const cleanCode = code.trim();
+      const codeId = 'code_' + Math.random().toString(36).substring(2, 9);
+      
+      return `
+        <div class="code-block-container">
+          <div class="code-block-header">
+            <span>${cleanLang}</span>
+            <button class="copy-code-btn" onclick="copyRawCode('${codeId}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <pre id="${codeId}"><code>${cleanCode}</code></pre>
+        </div>`;
+    });
+  }
+  
+  // Parsing lists correctly
+  txt = txt.replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>');
+  txt = txt.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>');
+  txt = txt.replace(/<\/ul>\s*<ul>/g, ''); // Concatenate continuous lists
+
+  // Bold text mapping adjustments
+  txt = txt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // Inline Code blocks
+  txt = txt.replace(/`(.*?)`/g, '<code>$1</code>');
+  
+  // Correct multiple continuous break issues safely
+  txt = txt.replace(/\n/g, '<br>');
+  
+  return txt;
+}
+
+function copyRawCode(id) {
+  const codeElement = document.getElementById(id);
+  if (!codeElement) return;
+  
+  const range = document.createRange();
+  range.selectNode(codeElement);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+  
+  try {
+    document.execCommand('copy');
+    showToast("Code copied to clipboard!");
+  } catch (err) {
+    showToast("Execution failure. Copy manually.");
+  }
+  window.getSelection().removeAllRanges();
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.innerText = message;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2200);
+}
+
+// ── TRANSMISSIONS & GENERATION LOGIC ──
+function send() {
+  const text = inputField.value.trim();
+  if (!text && !state.activeAttachment) return;
+  if (state.isGenerating) return;
+
+  // Defensive Checks: Daily standard accounts constraints
+  if (state.isLoggedIn && state.user && state.user.plan === 'free' && state.user.used >= state.user.limit) {
+    openUpgrade();
+    document.getElementById('upgrade-err').innerText = "Daily free request threshold reached. Upgrade to continue.";
+    return;
+  }
+
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  const currentAttachment = state.activeAttachment ? { ...state.activeAttachment } : null;
+  removeAttach();
+  
+  inputField.value = '';
+  inputField.style.height = "24px";
+  
+  if (!state.currentChatId) {
+    state.currentChatId = 'chat_' + Date.now();
+    state.chats[state.currentChatId] = {
+      title: text ? (text.length > 30 ? text.substring(0, 30) + '...' : text) : 'File session query',
+      messages: []
+    };
+  }
+
+  const userMsg = { role: 'user', content: text, attachment: currentAttachment };
+  state.chats[state.currentChatId].messages.push(userMsg);
+  appendMessageElement('user', text, currentAttachment);
+  
+  if (state.isLoggedIn && state.user && state.user.plan !== 'pro') {
+    state.user.used = (state.user.used || 0) + 1;
+  }
+  
+  saveState();
+  renderUserInterface();
+  triggerAiResponse(text);
+}
+
+function appendMessageElement(role, text, attachment) {
+  const msgGroup = document.createElement('div');
+  msgGroup.className = `msg-group ${role}`;
+  
+  let attachmentHtml = '';
+  if (attachment) {
+    if (attachment.type === 'image') {
+      attachmentHtml = `<img src="${attachment.base64}" class="img-preview" alt="User upload preview">`;
+    } else {
+      attachmentHtml = `
+        <div class="attach-chip" style="margin-bottom:12px; background:var(--s2)">
+          <div class="file-icon"><svg viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="attach-info">
+            <div class="attach-name" style="max-width:220px">${escapeHtml(attachment.name)}</div>
+          </div>
+        </div>`;
     }
-  },1000);
+  }
+
+  if (role === 'user') {
+    msgGroup.innerHTML = `
+      <div class="bubble">
+        ${attachmentHtml}
+        ${text ? `<p>${escapeHtml(text).replace(/\n/g, '<br>')}</p>` : ''}
+      </div>`;
+  } else {
+    msgGroup.innerHTML = `
+      <div class="ai-av">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </div>
+      <div class="bubble">${attachmentHtml}<div class="markdown-payload">${formatMarkdown(text)}</div></div>`;
+  }
+  
+  chatContainer.appendChild(msgGroup);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  return msgGroup;
 }
 
-// ── SIDEBAR TOGGLE (mobile) ───────────────────────────────────────────────
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
-}
-</script>
-</body>
-</html>
+function triggerAiResponse(queryText) {
+  state.isGenerating = true;
+  sendButton.disabled = true;
+
+  const loader = document.createElement('div');
+  loader.className = 'msg-group ai';
+  loader.id = 'ai-loader';
+  loader.innerHTML = `
+    <div class="ai-av">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </div>
+    <div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  chatContainer.appendChild(loader);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  // Mock responses logic for immersive demonstration
+  setTimeout(() => {
+    loader.remove();
+    
+    let responseText = "Understood. Let me formulate a plan for you.";
+    
+    if (queryText.toLowerCase().includes("python") || queryText.toLowerCase().includes("search")) {
+      responseText = "Here is a highly optimized binary search function in Python.\n\n
