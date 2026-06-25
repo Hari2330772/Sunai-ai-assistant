@@ -83,14 +83,44 @@ def check_pw(pw: str, hashed: str) -> bool:
 
 
 # ── Supabase helpers (using SDK) ──────────────────────────────────────────────
-def get_user_by_id(uid: str) -> dict | None:
-    res = supabase.table("users").select("*").eq("id", uid).maybe_single().execute()
-    return res.data
+def get_user_by_id(uid):
+    try:
+        res = (
+            supabase.table("users")
+            .select("*")
+            .eq("id", uid)
+            .maybe_single()
+            .execute()
+        )
+
+        if not res:
+            return None
+
+        return getattr(res, "data", None)
+
+    except Exception as e:
+        print("get_user_by_id:", e)
+        return None
 
 
-def get_user_by_email(email: str) -> dict | None:
-    res = supabase.table("users").select("*").eq("email", email).maybe_single().execute()
-    return res.data
+def get_user_by_email(email):
+    try:
+        res = (
+            supabase.table("users")
+            .select("*")
+            .eq("email", email)
+            .maybe_single()
+            .execute()
+        )
+
+        if not res:
+            return None
+
+        return getattr(res, "data", None)
+
+    except Exception as e:
+        print("get_user_by_email:", e)
+        return None
 
 
 def save_user(user: dict):
