@@ -9,6 +9,9 @@ from datetime import date, timedelta
 from functools import wraps
 from dotenv import load_dotenv
 from groq import Groq
+import google.generativeai as genai
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+vision_model = genai.GenerativeModel("gemini-1.5-flash")
 import urllib.request, urllib.error
 
 load_dotenv()
@@ -202,24 +205,19 @@ def analyze_image():
     if isinstance(usage, str): usage = json.loads(usage)
     used  = usage.get(today, 0)
     if user["plan"] == "free" and used >= FREE_LIMIT:
-        return jsonify({"error": "limit_reached", "message": "Daily limit reached!"}), 429
+        return jsonify({"error": "limit_reached",
+                        "message": "Daily limit reached!"}), 429
     if "image" not in request.files:
         return jsonify({"error": "No image uploaded"}), 400
     img_file = request.files["image"]
     question = request.form.get("question", "Describe this image in detail.")
-    img_data = base64.b64encode(img_file.read()).decode("utf-8")
-    mime     = img_file.content_type or "image/jpeg"
     try:
-        resp = groq_client.chat.completions.create(
-            model="llama-3.2-11b-vision-preview",
-            messages=[{"role": "user", "content": [
-                {"type": "text",      "text": f"You are SUNAI. {question}"},
-                {"type": "image_url", "image_url": {
-                    "url": f"data:{mime};base64,{img_data}",
-                    "detail": "low"
-                }}
-            ]}], max_tokens=800)
-        reply = resp.choices[0].message.content
+        import PIL.Image, io
+        img = PIL.Image.open(io.BytesIO(img_file.read()))
+        resp = vision_model.generate_content([
+            f"You are SUNAI, a helpful AI assistant. {question}", img
+        ])
+        reply = resp.text
         usage[today] = used + 1
         user["usage"] = usage
         save_user(user)
