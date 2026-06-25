@@ -390,18 +390,14 @@ function attachImage(input){
   if(!file) return;
   attachedImage = file;
   attachedType = 'image';
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const preview = document.getElementById('attach-preview');
-    const img = document.getElementById('preview-img');
-    const fileIcon = document.getElementById('preview-file-icon');
-    img.src = e.target.result;
-    img.style.display='block';
-    fileIcon.style.display='none';
-    document.getElementById('attach-name').textContent = file.name;
-    preview.style.display='flex';
-  };
-  reader.readAsDataURL(file);
+  const preview = document.getElementById('attach-preview');
+  const img = document.getElementById('preview-img');
+  const fileIcon = document.getElementById('preview-file-icon');
+  img.src = URL.createObjectURL(file);
+  img.style.display='block';
+  fileIcon.style.display='none';
+  document.getElementById('attach-name').textContent = file.name;
+  preview.style.display='flex';
   input.value='';
 }
 
@@ -449,10 +445,6 @@ function fmt(t){
 async function send(){
   const txt = inpEl.value.trim();
   if((!txt && !attachedType) || busy) return;
-  if(attachedType==='image' && !attachedImage){
-    alert('Image not loaded yet, please try again');
-    return;
-  }
   if(!userData){ openAuth('signup'); return; }
 
   document.getElementById('welcome')?.remove();
@@ -461,24 +453,11 @@ async function send(){
 
   if(attachedType==='image' && attachedImage){
     const imgUrl = document.getElementById('preview-img').src;
-    const imageToSend = attachedImage;
-    const questionToAsk = txt || 'Describe this image in detail.';
     addMsg('user',`${txt?`<p>${txt.replace(/</g,'&lt;')}</p>`:''}<img src="${imgUrl}" class="img-preview">`);
-    attachedFile = null; attachedImage = null; attachedType = null;
-    document.getElementById('attach-preview').style.display='none';
-    inpEl.value=''; grow(inpEl);
+    removeAttach();
     const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
     const fd = new FormData();
-    fd.append('image', imageToSend);
-    fd.append('question', questionToAsk);
-    try{
-        const res = await fetch('/analyze-image',{method:'POST',body:fd,credentials:'include'});
-        const data = await res.json();
-        tw.querySelector('.bub').innerHTML = data.error ? `<p style="color:var(--red)">${data.error}</p>` : fmt(data.reply);
-    }catch(e){tw.querySelector('.bub').innerHTML='<p>Error. Try again.</p>';}
-    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
-    const fd = new FormData();
-    fd.append('image', attachedImage);
+    fd.append('image', attachedImage || document.getElementById('img-input').files[0]);
     fd.append('question', txt || 'Describe this image in detail.');
     try{
       const res = await fetch('/analyze-image',{method:'POST',body:fd,credentials:'include'});
