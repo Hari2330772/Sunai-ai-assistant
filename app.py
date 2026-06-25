@@ -1,4 +1,4 @@
-
+"""
 SUNAI Pro v3 - Flask Backend with Supabase Database
 Users never get deleted! Persistent storage!
 """
@@ -192,3 +192,115 @@ def chat():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/analyze-image", methods=["POST"])
+@login_required
+def analyze_image():
+    uid  = session["user_id"]
+    user = get_user_by_id(uid)
+    if not user: return jsonify({"error": "not_found"}), 404
+    today = str(date.today())
+    usage = user.get("usage") or {}
+    if isinstance(usage, str): usage = json.loads(usage)
+    used  = usage.get(today, 0)
+    if user["plan"] == "free" and used >= FREE_LIMIT:
+        return jsonify({"error": "limit_reached", "message": "Daily limit reached!"}), 429
+    if "image" not in request.files:
+        return jsonify({"error": "No image uploaded"}), 400
+    img_file = request.files["image"]
+    question = request.form.get("question", "Describe this image in detail.")
+    img_data = base64.b64encode(img_file.read()).decode("utf-8")
+    mime     = img_file.content_type or "image/jpeg"
+    try:
+        resp = groq_client.chat.completions.create(
+            model="llama-3.2-11b-vision-preview",
+            messages=[{"role": "user", "content": [
+                {"type": "text",      "text": f"You are SUNAI. {question}"},
+                {"type": "image_url", "image_url": {
+                    "url": f"data:{mime};base64,{img_data}",
+                    "detail": "low"
+                }}
+            ]}], max_tokens=800)
+        reply = resp.choices[0].message.content
+        usage[today] = used + 1
+        user["usage"] = usage
+        save_user(user)
+        add_history(uid, "user",      f"[Image] {question}")
+        add_history(uid, "assistant", reply)
+        return jsonify({"reply": reply})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/analyze-file", methods=["POST"])
+@login_required
+def analyze_file():
+    uid  = session["user_id"]
+    user = get_user_by_id(uid)
+    if not user: return jsonify({"error": "not_found"}), 404
+    today = str(date.today())
+    usage = user.get("usage") or {}
+    if isinstance(usage, str): usage = json.loads(usage)
+    used  = usage.get(today, 0)
+    if user["plan"] == "free" and used >= FREE_LIMIT:
+        return jsonify({"error": "limit_reached", "message": "Daily limit reached!"}), 429
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    file     = request.files["file"]
+    question = request.form.get("question", "Summarize this document.")
+    fname    = file.filename.lower()
+    try:
+        if fname.endswith(".pdf"):
+            import PyPDF2, io
+            reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
+            text   = "\n".join(p.extract_text() or "" for p in reader.pages)
+        elif fname.endswith((".txt",".py",".js",".html",".css",".csv",".md")):
+            text = file.read().decode("utf-8", errors="ignore")
+        else:
+            return jsonify({"error": "Unsupported file. Use PDF, TXT, PY, JS, HTML, CSV, MD"}), 400
+        text = text[:8000]
+        resp = groq_client.chat.completions.create(
+            model="qwen/qwen3.6-27b",
+            messages=[{"role": "system", "content": "You are SUNAI, a helpful AI assistant."},
+                      {"role": "user",   "content": f"File:\n\n{text}\n\nQuestion: {question}"}],
+            max_tokens=1500)
+        reply = resp.choices[0].message.content
+        usage[today] = used + 1
+        user["usage"] = usage
+        save_user(user)
+        add_history(uid, "user",      f"[File: {file.filename}] {question}")
+        add_history(uid, "assistant", reply)
+        return jsonify({"reply": reply})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/history")
+@login_required
+def history():
+    rows = get_history(session["user_id"])
+    hist = [{"role": r["role"], "content": r["content"], "time": r.get("created_at","")}
+            for r in rows]
+    return jsonify({"history": hist})
+
+@app.route("/history/clear", methods=["POST"])
+@login_required
+def clear_history():
+    clear_history_db(session["user_id"])
+    return jsonify({"success": True})
+
+@app.route("/sitemap.xml")
+def sitemap():
+    base = os.environ.get("SITE_URL", "https://sunai-ai-assistant-1.onrender.com")
+    xml  = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>{base}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+</urlset>"""
+    return app.response_class(xml, mimetype="application/xml")
+
+@app.route("/robots.txt")
+def robots():
+    base = os.environ.get("SITE_URL", "https://sunai-ai-assistant-1.onrender.com")
+    return app.response_class(
+        f"User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml",
+        mimetype="text/plain")
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
