@@ -249,7 +249,7 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<input type="file" id="img-input" accept="image/*" capture="environment" onchange="attachImage(this)">
+<input type="file" id="img-input" accept="image/*" onchange="attachImage(this)">
 <input type="file" id="file-input" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)">
 
 <!-- AUTH MODAL -->
@@ -461,8 +461,21 @@ async function send(){
 
   if(attachedType==='image' && attachedImage){
     const imgUrl = document.getElementById('preview-img').src;
+    const imageToSend = attachedImage;
+    const questionToAsk = txt || 'Describe this image in detail.';
     addMsg('user',`${txt?`<p>${txt.replace(/</g,'&lt;')}</p>`:''}<img src="${imgUrl}" class="img-preview">`);
-    removeAttach();
+    attachedFile = null; attachedImage = null; attachedType = null;
+    document.getElementById('attach-preview').style.display='none';
+    inpEl.value=''; grow(inpEl);
+    const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+    const fd = new FormData();
+    fd.append('image', imageToSend);
+    fd.append('question', questionToAsk);
+    try{
+        const res = await fetch('/analyze-image',{method:'POST',body:fd,credentials:'include'});
+        const data = await res.json();
+        tw.querySelector('.bub').innerHTML = data.error ? `<p style="color:var(--red)">${data.error}</p>` : fmt(data.reply);
+    }catch(e){tw.querySelector('.bub').innerHTML='<p>Error. Try again.</p>';}
     const tw = addMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
     const fd = new FormData();
     fd.append('image', attachedImage);
