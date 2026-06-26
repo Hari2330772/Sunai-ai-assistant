@@ -768,7 +768,7 @@ async function sendStream(userText) {
         rawText += payload;
         // Render markdown incrementally (marked is fast enough)
         mdEl.innerHTML = renderMD(rawText);
-        chatEl.scrollTop = chatEl.scrollHeight;
+        //chatEl.scrollTop = chatEl.scrollHeight;
       }
     }
     finishStream(group, rawText, true);
@@ -802,7 +802,7 @@ function finishStream(group, text, success) {
   S.streamId  = null;
   sndBtn.disabled = false;
   stopBtn.classList.remove('visible');
-  chatEl.scrollTop = chatEl.scrollHeight;
+  //chatEl.scrollTop = chatEl.scrollHeight;
   renderUI(); // refresh usage
   checkSession();
 }
