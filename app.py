@@ -1067,7 +1067,7 @@ def analyze_file():
             text = file.read().decode("utf-8", errors="ignore")
         text = text[:8000]
         resp = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": "You are SUNAI, a helpful AI assistant."},
                 {"role": "user",   "content": f"File:\n\n{text}\n\nQuestion: {question}"},
