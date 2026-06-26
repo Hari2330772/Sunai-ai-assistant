@@ -999,7 +999,7 @@ def generate_image():
     try:
         response = imagen_model.generate_content(
             contents=prompt,
-            generation_config=genai.GenerationConfig(response_modalities=["IMAGE", "TEXT"]),
+            
         )
         for part in response.candidates[0].content.parts:
             if part.inline_data:
