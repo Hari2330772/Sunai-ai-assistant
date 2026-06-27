@@ -385,6 +385,35 @@ def format_search_context(results: list[dict]) -> str:
     return "\n".join(lines)
 
 
+# ── Auth decorator ─────────────────────────────────────────────────────────────
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        uid   = session.get("user_id")
+        token = session.get("session_token")
+        if not uid or not token:
+            return jsonify({"error": "login_required"}), 401
+        if not verify_session_token(uid, token):
+            session.clear()
+            return jsonify({"error": "session_expired"}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        uid = session.get("user_id")
+        if not uid:
+            return jsonify({"error": "login_required"}), 401
+        user = get_user_by_id(uid)
+        if not user or user.get("role") != "admin":
+            return jsonify({"error": "forbidden"}), 403
+        return f(*args, **kwargs)
+    return decorated
+
+def get_current_user() -> dict | None:
+    return get_user_by_id(session.get("user_id", ""))
+
 # ── Manual search endpoint (frontend can call directly) ───────────────────────
 @app.route("/search", methods=["POST"])
 @login_required
@@ -561,35 +590,6 @@ def log_event(event_type: str, uid: str = None, meta: dict = None):
         }).execute()
     except:
         pass
-
-# ── Auth decorator ─────────────────────────────────────────────────────────────
-def login_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        uid   = session.get("user_id")
-        token = session.get("session_token")
-        if not uid or not token:
-            return jsonify({"error": "login_required"}), 401
-        if not verify_session_token(uid, token):
-            session.clear()
-            return jsonify({"error": "session_expired"}), 401
-        return f(*args, **kwargs)
-    return decorated
-
-def admin_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        uid = session.get("user_id")
-        if not uid:
-            return jsonify({"error": "login_required"}), 401
-        user = get_user_by_id(uid)
-        if not user or user.get("role") != "admin":
-            return jsonify({"error": "forbidden"}), 403
-        return f(*args, **kwargs)
-    return decorated
-
-def get_current_user() -> dict | None:
-    return get_user_by_id(session.get("user_id", ""))
 
 # ── File validation ────────────────────────────────────────────────────────────
 ALLOWED_MIME = {
