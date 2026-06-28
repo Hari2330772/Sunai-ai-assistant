@@ -625,8 +625,14 @@ def _check_quota(user: dict):
 
 @app.route("/")
 def index():
-    return render_template("index.html", free_limit=FREE_LIMIT,
+    resp = render_template("index.html", free_limit=FREE_LIMIT,
                            razorpay_key_id=os.environ.get("RAZORPAY_KEY_ID", ""))
+    from flask import make_response
+    r = make_response(resp)
+    r.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    return r
 
 # ── Register ──────────────────────────────────────────────────────────────────
 @app.route("/register", methods=["POST"])
