@@ -224,18 +224,7 @@ textarea::placeholder{color:var(--subtle)}
 .att-btn .tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--s3);color:var(--text);font-size:11px;padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.15s;border:1px solid var(--border)}
 .att-btn:hover .tooltip{opacity:1}
 .input-hint{flex:1;text-align:right;font-size:11px;color:var(--subtle);padding-right:6px}
-/* file inputs: visually hidden but accessible via label[for] */
-#img-inp, #file-inp {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0,0,0,0);
-  white-space: nowrap;
-  border: 0;
-}
+/* file inputs handled inline in labels */
 
 /* ── MODAL SYSTEM ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:16px}
@@ -442,25 +431,27 @@ textarea::placeholder{color:var(--subtle)}
       </button>
     </div>
     <div class="input-bottom">
-      <!-- Image attach: label[for] is the ONLY reliable way to open file picker -->
-      <label for="img-inp" class="att-btn" title="Attach Image">
+      <!-- Image attach -->
+      <label class="att-btn" title="Attach Image" style="overflow:hidden">
+        <input type="file" id="img-inp" accept="image/*" onchange="attachImg(this)"
+               style="font-size:100px;position:absolute;right:0;top:0;opacity:0;cursor:pointer;height:100%;width:100%">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         <span class="tooltip">Attach Image</span>
       </label>
-      <input type="file" id="img-inp" accept="image/*" onchange="attachImg(this)">
 
       <!-- File attach -->
-      <label for="file-inp" class="att-btn" title="Attach File">
+      <label class="att-btn" title="Attach File" style="overflow:hidden">
+        <input type="file" id="file-inp" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)"
+               style="font-size:100px;position:absolute;right:0;top:0;opacity:0;cursor:pointer;height:100%;width:100%">
         <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
         <span class="tooltip">Attach File</span>
       </label>
-      <input type="file" id="file-inp" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)">
 
       <button class="att-btn" id="voice-btn" onclick="toggleVoice()" title="Voice Input">
         <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         <span class="tooltip">Voice Input</span>
       </button>
-      <span class="input-hint" id="input-hint">SUNAI v6.0 · Enter to send</span>
+      <span class="input-hint" id="input-hint">SUNAI v6.1 · Enter to send</span>
     </div>
   </div>
 </div>
