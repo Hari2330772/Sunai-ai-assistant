@@ -27,7 +27,6 @@ from functools import wraps
 from dotenv import load_dotenv
 from supabase import create_client, Client
 from groq import Groq
-from openai import OpenAI
 import google.generativeai as genai
 import smtplib
 import re
@@ -67,19 +66,6 @@ supabase: Client = create_client(
 )
 groq_client = Groq(api_key=os.environ["GROQ_API_KEY"])
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-
-# ── Extra free LLM providers (fallback chain) ─────────────────────────────────
-CEREBRAS_API_KEY = os.environ.get("CEREBRAS_API_KEY", "")
-cerebras_client = OpenAI(
-    api_key=CEREBRAS_API_KEY or "dummy",
-    base_url="https://api.cerebras.ai/v1",
-) if CEREBRAS_API_KEY else None
-
-# DuckDuckGo AI Chat — completely free, no key needed
-ddg_client = OpenAI(
-    api_key="dummy",
-    base_url="https://duckduckgo.com/duckchat/v1/chat",
-)
 vision_model   = genai.GenerativeModel("gemini-1.5-flash")
 imagen_model   = genai.GenerativeModel("gemini-2.0-flash-preview-image-generation")
 rzp_client = razorpay.Client(
@@ -87,18 +73,16 @@ rzp_client = razorpay.Client(
 )
 
 FREE_LIMIT          = 10
-HISTORY_LIMIT       = 200
+HISTORY_LIMIT       = 100
 FREE_HISTORY_TTL    = 30
 MEMORY_LIMIT        = 20          # max stored memories per user
 ADMIN_EMAILS        = set(os.environ.get("ADMIN_EMAILS", "").split(","))
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# WEB SEARCH — Serper (primary) + DuckDuckGo (free fallback, no key needed)
-# ══════════════════════════════════════════════════════════════════════════════
+# ── Web Search (Serper API) ───────────────────────────────────────────────────
 SERPER_API_KEY = os.environ.get("SERPER_API_KEY", "")
 
-# Queries that signal the user needs live / current information
+# Keywords that strongly signal the user wants current / live information
 _LIVE_PATTERNS = re.compile(
     r"\b(today|tonight|yesterday|this week|this month|this year|right now|"
     r"current(ly)?|latest|recent(ly)?|new(est)?|just (announced|released|happened)|"
@@ -109,124 +93,17 @@ _LIVE_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
-
-# ── Unified LLM fallback chain ────────────────────────────────────────────────
-# Order: Groq 70B → Groq 8B → Cerebras → Gemini Flash → DuckDuckGo AI
-_OPENAI_PROVIDERS = [
-    {"name": "groq-70b",  "model": "llama-3.3-70b-versatile", "type": "groq"},
-    {"name": "groq-8b",   "model": "llama-3.1-8b-instant",    "type": "groq"},
-    {"name": "cerebras",  "model": "llama-3.3-70b",           "type": "openai_cerebras"},
-    {"name": "ddg",       "model": "gpt-4o-mini",             "type": "openai_ddg"},
-]
-
-# Gemini chat model — reuses existing GEMINI_API_KEY, no extra setup
-gemini_chat_model = genai.GenerativeModel("gemini-2.0-flash")
-
-def _is_rate_limit(err: Exception) -> bool:
-    s = str(err).lower()
-    return "rate_limit" in s or "429" in s or "quota" in s or "exceeded" in s or "resource_exhausted" in s
-
-def _gemini_chat(messages: list, max_tokens: int = 1024, stream: bool = False):
-    """Convert OpenAI-style messages to Gemini format and call Gemini."""
-    system_parts = [m["content"] for m in messages if m["role"] == "system"]
-    history = []
-    for m in messages:
-        if m["role"] == "system":
-            continue
-        role = "user" if m["role"] == "user" else "model"
-        history.append({"role": role, "parts": [m["content"]]})
-    
-    model = gemini_chat_model
-    if system_parts:
-        model = genai.GenerativeModel(
-            "gemini-2.0-flash",
-            system_instruction=system_parts[0],
-        )
-    
-    chat = model.start_chat(history=history[:-1] if len(history) > 1 else [])
-    last_msg = history[-1]["parts"][0] if history else ""
-    
-    if stream:
-        # Return a generator that mimics OpenAI streaming chunks
-        def _gemini_stream():
-            response = chat.send_message(
-                last_msg,
-                generation_config=genai.GenerationConfig(max_output_tokens=max_tokens),
-                stream=True,
-            )
-            for chunk in response:
-                yield chunk.text or ""
-        return _gemini_stream(), "gemini"
-    else:
-        response = chat.send_message(
-            last_msg,
-            generation_config=genai.GenerationConfig(max_output_tokens=max_tokens),
-        )
-        return response.text, "gemini"
-
-def llm_chat(messages: list, max_tokens: int = 1024, stream: bool = False):
-    """Try each provider in order; return (result, provider_name).
-    
-    For non-streaming: result is an OpenAI response object OR a plain string (Gemini).
-    For streaming:     result is an iterable of token strings (unified).
-    Callers should use: text = result.choices[0].message.content  OR  text = result (str)
-    Use llm_chat_text() below for a simpler string-returning wrapper.
-    """
-    last_err = None
-
-    # Try OpenAI-compatible providers first
-    for p in _OPENAI_PROVIDERS:
-        client = None
-        if p["type"] == "groq":
-            client = groq_client
-        elif p["type"] == "openai_cerebras" and cerebras_client:
-            client = cerebras_client
-        elif p["type"] == "openai_ddg":
-            client = ddg_client
-        if client is None:
-            continue
-        try:
-            result = client.chat.completions.create(
-                model=p["model"],
-                messages=messages,
-                max_tokens=max_tokens,
-                stream=stream,
-            )
-            return result, p["name"]
-        except Exception as e:
-            if _is_rate_limit(e):
-                last_err = e
-                continue
-            raise
-
-    # Gemini fallback (different SDK — handles it separately)
-    try:
-        return _gemini_chat(messages, max_tokens=max_tokens, stream=stream)
-    except Exception as e:
-        if _is_rate_limit(e):
-            last_err = e
-        else:
-            raise
-
-    raise last_err or RuntimeError("All LLM providers exhausted")
-
-
-def _extract_text(result, is_stream: bool = False):
-    """Normalise result from llm_chat into plain text (non-streaming only)."""
-    if isinstance(result, str):
-        return result   # Gemini non-stream returns plain string
-    return result.choices[0].message.content
-
 def needs_web_search(query: str) -> bool:
-    """Return True when the query likely needs live web results."""
+    """Decide whether to fetch live web results for this query."""
+    if not SERPER_API_KEY:
+        return False
     return bool(_LIVE_PATTERNS.search(query))
 
-
-# ── Provider 1: Serper.dev  (Google Search, 2 500 free queries/month) ─────────
-def _search_serper(query: str, num: int = 5) -> list[dict]:
+def web_search(query: str, num: int = 5) -> list[dict]:
     """
-    https://serper.dev  → sign up → API Key (free tier: 2 500/month)
-    Set SERPER_API_KEY in .env to enable.
+    Call Serper.dev Google Search API.
+    Returns a list of {title, snippet, link} dicts.
+    Free plan: 2 500 queries/month — https://serper.dev
     """
     if not SERPER_API_KEY:
         return []
@@ -235,203 +112,40 @@ def _search_serper(query: str, num: int = 5) -> list[dict]:
         req = urllib.request.Request(
             "https://google.serper.dev/search",
             data=payload,
-            headers={"X-API-KEY": SERPER_API_KEY,
-                     "Content-Type": "application/json"},
+            headers={
+                "X-API-KEY": SERPER_API_KEY,
+                "Content-Type": "application/json",
+            },
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=6) as resp:
             data = json.loads(resp.read())
-        return [
-            {"title":   item.get("title", ""),
-             "snippet": item.get("snippet", ""),
-             "link":    item.get("link", "")}
-            for item in data.get("organic", [])[:num]
-        ]
+        results = []
+        for item in data.get("organic", [])[:num]:
+            results.append({
+                "title":   item.get("title", ""),
+                "snippet": item.get("snippet", ""),
+                "link":    item.get("link", ""),
+            })
+        return results
     except Exception as e:
-        app.logger.warning("Serper search error: %s", e)
+        app.logger.warning(f"web_search error: {e}")
         return []
 
-
-# ── Provider 2: DuckDuckGo  (completely free, no API key) ─────────────────────
-def _search_ddg(query: str, num: int = 5) -> list[dict]:
-    """
-    Uses DuckDuckGo's unofficial instant-answer + HTML endpoints.
-    No API key required. Rate-limited by DDG (~1 req/sec is safe).
-
-    Strategy:
-      1. Try the DuckDuckGo Instant Answer JSON API (fast, structured).
-      2. If that returns nothing useful, scrape the lite HTML endpoint.
-    """
-    results: list[dict] = []
-
-    # ── Step 1: Instant Answer API ───────────────────────────────────────────
-    try:
-        encoded = urllib.parse.quote_plus(query)
-        url = f"https://api.duckduckgo.com/?q={encoded}&format=json&no_html=1&skip_disambig=1"
-        req = urllib.request.Request(url, headers={"User-Agent": "SUNAI/5.0"})
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            data = json.loads(resp.read())
-
-        # Abstract result (Wikipedia-style answer)
-        if data.get("AbstractText") and data.get("AbstractURL"):
-            results.append({
-                "title":   data.get("Heading", query),
-                "snippet": data["AbstractText"][:300],
-                "link":    data["AbstractURL"],
-            })
-
-        # Related topics
-        for topic in data.get("RelatedTopics", []):
-            if len(results) >= num:
-                break
-            # Topics can be nested groups
-            if "Topics" in topic:
-                for sub in topic["Topics"]:
-                    if len(results) >= num:
-                        break
-                    text = sub.get("Text", "")
-                    url_ = sub.get("FirstURL", "")
-                    if text and url_:
-                        results.append({"title": text[:80], "snippet": text[:250], "link": url_})
-            else:
-                text = topic.get("Text", "")
-                url_ = topic.get("FirstURL", "")
-                if text and url_:
-                    results.append({"title": text[:80], "snippet": text[:250], "link": url_})
-    except Exception as e:
-        app.logger.warning("DDG instant API error: %s", e)
-
-    # ── Step 2: Lite HTML scraper fallback ────────────────────────────────────
-    if len(results) < 2:
-        try:
-            encoded = urllib.parse.quote_plus(query)
-            url  = f"https://lite.duckduckgo.com/lite/?q={encoded}"
-            req  = urllib.request.Request(url, headers={
-                "User-Agent": "Mozilla/5.0 (compatible; SUNAI/5.0)",
-                "Accept-Language": "en-US,en;q=0.9",
-            })
-            with urllib.request.urlopen(req, timeout=8) as resp:
-                html = resp.read().decode("utf-8", errors="ignore")
-
-            # Parse result snippets — DDG lite uses <a class="result-link"> and
-            # nearby <td> cells for snippet text.
-            link_pattern   = re.compile(
-                r'<a[^>]+class="result-link"[^>]*href="([^"]+)"[^>]*>([^<]+)<', re.S)
-            snippet_pattern = re.compile(
-                r'<td[^>]+class="result-snippet"[^>]*>(.*?)</td>', re.S)
-
-            links   = link_pattern.findall(html)
-            snippets = [re.sub(r'<[^>]+>', '', s).strip()
-                        for s in snippet_pattern.findall(html)]
-
-            for i, (href, title) in enumerate(links[:num]):
-                snippet = snippets[i] if i < len(snippets) else ""
-                # DDG lite uses redirect URLs — extract the real URL
-                real_url = href
-                uddg_match = re.search(r'uddg=([^&]+)', href)
-                if uddg_match:
-                    try:
-                        real_url = urllib.parse.unquote(uddg_match.group(1))
-                    except Exception:
-                        pass
-                results.append({
-                    "title":   title.strip()[:120],
-                    "snippet": snippet[:300],
-                    "link":    real_url,
-                })
-                if len(results) >= num:
-                    break
-        except Exception as e:
-            app.logger.warning("DDG HTML scrape error: %s", e)
-
-    return results[:num]
-
-
-# ── Unified search dispatcher ──────────────────────────────────────────────────
-def web_search(query: str, num: int = 5) -> list[dict]:
-    """
-    Try Serper first (if key is set). Fall back to DuckDuckGo automatically.
-    Always returns a list of {title, snippet, link} dicts (may be empty).
-    """
-    if SERPER_API_KEY:
-        results = _search_serper(query, num)
-        if results:
-            return results
-        app.logger.info("Serper returned empty — falling back to DuckDuckGo")
-
-    return _search_ddg(query, num)
-
-
-# ── Search context formatter ───────────────────────────────────────────────────
 def format_search_context(results: list[dict]) -> str:
-    """Turn search results into a compact context block injected into the prompt."""
+    """Turn search results into a compact context block for the prompt."""
     if not results:
         return ""
-    lines = [
-        "--- WEB SEARCH RESULTS ---",
-        f"Current date: {datetime.utcnow().strftime('%B %d, %Y')} UTC",
-        "",
-    ]
+    lines = ["--- WEB SEARCH RESULTS (today's date injected below) ---",
+             f"Current date: {datetime.utcnow().strftime('%B %d, %Y')} UTC", ""]
     for i, r in enumerate(results, 1):
         lines.append(f"[{i}] {r['title']}")
         lines.append(f"    {r['snippet']}")
         lines.append(f"    Source: {r['link']}")
         lines.append("")
-    lines += [
-        "--- END OF SEARCH RESULTS ---",
-        "Use the above results to answer accurately. "
-        "Cite sources using [1], [2] etc. when you use them.",
-    ]
+    lines.append("--- END OF SEARCH RESULTS ---")
+    lines.append("Use the above results to answer accurately. Cite sources as [1], [2] etc. when relevant.")
     return "\n".join(lines)
-
-
-# ── Auth decorator ─────────────────────────────────────────────────────────────
-def login_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        uid   = session.get("user_id")
-        token = session.get("session_token")
-        if not uid or not token:
-            return jsonify({"error": "login_required"}), 401
-        if not verify_session_token(uid, token):
-            session.clear()
-            return jsonify({"error": "session_expired"}), 401
-        return f(*args, **kwargs)
-    return decorated
-
-def admin_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        uid = session.get("user_id")
-        if not uid:
-            return jsonify({"error": "login_required"}), 401
-        user = get_user_by_id(uid)
-        if not user or user.get("role") != "admin":
-            return jsonify({"error": "forbidden"}), 403
-        return f(*args, **kwargs)
-    return decorated
-
-def get_current_user() -> dict | None:
-    return get_user_by_id(session.get("user_id", ""))
-
-# ── Manual search endpoint (frontend can call directly) ───────────────────────
-@app.route("/search", methods=["POST"])
-@login_required
-@limiter.limit("30/minute")
-def search_endpoint():
-    """
-    Expose web search to the frontend for standalone search queries.
-    POST { "query": "...", "num": 5 }
-    Returns { "results": [...], "provider": "serper"|"duckduckgo" }
-    """
-    d     = request.get_json(silent=True) or {}
-    query = d.get("query", "").strip()[:300]
-    num   = min(int(d.get("num", 5)), 10)
-    if not query:
-        return jsonify({"error": "Query required"}), 400
-    results  = web_search(query, num)
-    provider = "serper" if SERPER_API_KEY and results else "duckduckgo"
-    return jsonify({"results": results, "provider": provider, "query": query})
 
 # ── Password helpers ──────────────────────────────────────────────────────────
 def hash_pw(pw: str) -> str:
@@ -566,11 +280,12 @@ def extract_and_save_memories(uid: str, conversation: list):
         convo_text = "\n".join(
             f"{m['role'].upper()}: {m['content'][:300]}" for m in conversation[-6:]
         )
-        resp, _ = llm_chat(
+        resp = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": extract_prompt + convo_text}],
             max_tokens=200,
         )
-        text = _extract_text(resp).strip()
+        text = resp.choices[0].message.content.strip()
         if text.upper() != "NONE":
             for line in text.split("\n"):
                 line = line.strip("- •·").strip()
@@ -590,6 +305,35 @@ def log_event(event_type: str, uid: str = None, meta: dict = None):
         }).execute()
     except:
         pass
+
+# ── Auth decorator ─────────────────────────────────────────────────────────────
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        uid   = session.get("user_id")
+        token = session.get("session_token")
+        if not uid or not token:
+            return jsonify({"error": "login_required"}), 401
+        if not verify_session_token(uid, token):
+            session.clear()
+            return jsonify({"error": "session_expired"}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        uid = session.get("user_id")
+        if not uid:
+            return jsonify({"error": "login_required"}), 401
+        user = get_user_by_id(uid)
+        if not user or user.get("role") != "admin":
+            return jsonify({"error": "forbidden"}), 403
+        return f(*args, **kwargs)
+    return decorated
+
+def get_current_user() -> dict | None:
+    return get_user_by_id(session.get("user_id", ""))
 
 # ── File validation ────────────────────────────────────────────────────────────
 ALLOWED_MIME = {
@@ -625,14 +369,8 @@ def _check_quota(user: dict):
 
 @app.route("/")
 def index():
-    resp = render_template("index.html", free_limit=FREE_LIMIT,
+    return render_template("index.html", free_limit=FREE_LIMIT,
                            razorpay_key_id=os.environ.get("RAZORPAY_KEY_ID", ""))
-    from flask import make_response
-    r = make_response(resp)
-    r.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    return r
 
 # ── Register ──────────────────────────────────────────────────────────────────
 @app.route("/register", methods=["POST"])
@@ -744,7 +482,83 @@ def login():
         "email_verified": user.get("email_verified", True),
     })
 
-# ── Forgot password ────────────────────────────────────────────────────────────
+# ── Google OAuth ───────────────────────────────────────────────────────────────
+@app.route("/auth/google")
+def google_auth():
+    from google_auth_oauthlib.flow import Flow
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": os.environ["GOOGLE_CLIENT_ID"],
+                "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [os.environ.get("SITE_URL", "") + "/auth/google/callback"],
+            }
+        },
+        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/userinfo.profile"],
+    )
+    flow.redirect_uri = os.environ.get("SITE_URL", "") + "/auth/google/callback"
+    auth_url, state = flow.authorization_url(access_type="offline", prompt="select_account")
+    session["oauth_state"] = state
+    return redirect(auth_url)
+
+@app.route("/auth/google/callback")
+def google_callback():
+    try:
+        from google_auth_oauthlib.flow import Flow
+        import google.auth.transport.requests
+        import requests as pyrequests
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": os.environ["GOOGLE_CLIENT_ID"],
+                    "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [os.environ.get("SITE_URL", "") + "/auth/google/callback"],
+                }
+            },
+            scopes=["openid", "https://www.googleapis.com/auth/userinfo.email",
+                    "https://www.googleapis.com/auth/userinfo.profile"],
+            state=session.get("oauth_state"),
+        )
+        flow.redirect_uri = os.environ.get("SITE_URL", "") + "/auth/google/callback"
+        flow.fetch_token(authorization_response=request.url)
+        creds = flow.credentials
+        resp = pyrequests.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {creds.token}"}
+        )
+        info = resp.json()
+        email = info.get("email", "").lower()
+        name  = info.get("name", email.split("@")[0])
+
+        user = get_user_by_email(email)
+        if not user:
+            uid = str(uuid.uuid4())
+            role = "admin" if email in ADMIN_EMAILS else "user"
+            user = {
+                "id": uid, "name": name, "email": email,
+                "password": hash_pw(secrets.token_hex(16)),
+                "plan": "free", "joined": str(date.today()),
+                "email_verified": True, "role": role,
+            }
+            save_user(user)
+            log_event("register_google", uid)
+
+        session_token = str(uuid.uuid4())
+        set_session_token(user["id"], session_token)
+        session.permanent = True
+        session["user_id"] = user["id"]
+        session["session_token"] = session_token
+        log_event("login_google", user["id"])
+        return redirect("/")
+    except Exception as e:
+        app.logger.exception("Google OAuth callback failed")
+        return redirect("/?error=oauth_failed")
+
 # ── Forgot password ────────────────────────────────────────────────────────────
 @app.route("/forgot-password", methods=["POST"])
 @limiter.limit("3/minute; 10/hour")
@@ -907,37 +721,26 @@ def chat_stream():
 
     # Tell the frontend if we ran a search (so it can show a small indicator)
     did_search = bool(search_results)
-    search_provider = "serper" if (SERPER_API_KEY and did_search) else "duckduckgo"
 
     def generate():
         if did_search:
-            yield f"data: {json.dumps({'searching': True, 'provider': search_provider, 'sources': [r['link'] for r in search_results]})}\n\n"
+            yield f"data: {json.dumps({'searching': True, 'sources': [r['link'] for r in search_results]})}\n\n"
 
         full_reply = []
         try:
-            # Try primary model, fall back to faster/cheaper model on rate limit
-            stream, _provider = llm_chat(
-                    messages=[{"role": "system", "content": system_prompt}] + clean_messages,
-                    max_tokens=1024,
-                    stream=True,
-                )
+            stream = groq_client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "system", "content": system_prompt}] + clean_messages,
+                max_tokens=2048,
+                stream=True,
+            )
             for chunk in stream:
                 delta = chunk.choices[0].delta.content or ""
                 if delta:
                     full_reply.append(delta)
                     yield f"data: {json.dumps({'token': delta})}\n\n"
         except Exception as e:
-            err_str = str(e)
-            if "rate_limit" in err_str or "429" in err_str or "Rate limit" in err_str:
-                friendly = "Rate limit reached. Please wait a moment and try again."
-            elif "quota" in err_str.lower() or "exceeded" in err_str.lower():
-                friendly = "Daily quota exceeded. Please try again tomorrow."
-            elif "timeout" in err_str.lower():
-                friendly = "Request timed out. Please try again."
-            else:
-                friendly = "Something went wrong. Please try again."
-            app.logger.warning(f"Groq stream error: {err_str}")
-            yield f"data: {json.dumps({'error': friendly})}\n\n"
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
             return
 
         # Save to DB after stream completes
@@ -994,19 +797,18 @@ def chat():
         + mem_block
     )
     try:
-        resp, _provider = llm_chat(
+        resp = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "system", "content": system_prompt}] + clean_messages,
-            max_tokens=1024,
+            max_tokens=2048,
         )
-        reply = _extract_text(resp)
+        reply = resp.choices[0].message.content
         uid = user["id"]
         add_history(uid, "user", clean_messages[-1]["content"])
         add_history(uid, "assistant", reply)
         used = get_today_usage(uid)
         remaining = 999 if user["plan"] == "pro" else max(0, FREE_LIMIT - used)
-        search_provider = "serper" if (SERPER_API_KEY and search_results) else "duckduckgo"
-        return jsonify({"reply": reply, "remaining": remaining, "plan": user["plan"],
-                        "searched": bool(search_results), "provider": search_provider})
+        return jsonify({"reply": reply, "remaining": remaining, "plan": user["plan"]})
     except Exception:
         app.logger.exception("Chat failed")
         return jsonify({"error": "Processing failed."}), 500
@@ -1036,9 +838,7 @@ def analyze_image():
         reply = resp.text
         add_history(user["id"], "user", f"[Image] {question}")
         add_history(user["id"], "assistant", reply)
-        used = get_today_usage(user["id"])
-        remaining = 999 if user["plan"] == "pro" else max(0, FREE_LIMIT - used)
-        return jsonify({"reply": reply, "remaining": remaining})
+        return jsonify({"reply": reply})
     except Exception:
         app.logger.exception("Image analysis failed")
         return jsonify({"error": "Image processing failed."}), 500
@@ -1128,19 +928,18 @@ def analyze_file():
         else:
             text = file.read().decode("utf-8", errors="ignore")
         text = text[:8000]
-        resp, _provider = llm_chat(
+        resp = groq_client.chat.completions.create(
+            model="llama-3.1-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are SUNAI, a helpful AI assistant."},
                 {"role": "user",   "content": f"File:\n\n{text}\n\nQuestion: {question}"},
             ],
             max_tokens=2048,
         )
-        reply = _extract_text(resp)
+        reply = resp.choices[0].message.content
         add_history(user["id"], "user", f"[File: {file.filename}] {question}")
         add_history(user["id"], "assistant", reply)
-        used = get_today_usage(user["id"])
-        remaining = 999 if user["plan"] == "pro" else max(0, FREE_LIMIT - used)
-        return jsonify({"reply": reply, "remaining": remaining})
+        return jsonify({"reply": reply})
     except Exception:
         app.logger.exception("File analysis failed")
         return jsonify({"error": "File processing failed."}), 500
