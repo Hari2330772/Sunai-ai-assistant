@@ -76,6 +76,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:14p
 .logout-btn{width:30px;height:30px;border-radius:6px;color:var(--muted);background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
 .logout-btn:hover{color:var(--red);background:rgba(239,68,68,0.1)}
 
+/* ── VERIFY BANNER ── */
+#verify-banner{display:none;background:rgba(59,130,246,0.1);border-bottom:1px solid rgba(59,130,246,0.2);padding:10px 20px;font-size:13px;color:#93C5FD;text-align:center;flex-shrink:0}
+#verify-banner a{color:#60A5FA;cursor:pointer;font-weight:600;margin-left:8px}
+#verify-banner a:hover{text-decoration:underline}
+
 /* ── USAGE STRIP ── */
 .usage-strip{padding:8px 20px 4px;display:none;flex-shrink:0}
 .usage-row{display:flex;align-items:center;gap:12px;background:rgba(24,24,27,0.5);border:1px solid var(--border);padding:10px 14px;border-radius:12px}
@@ -161,9 +166,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:14p
 .search-pulse span:nth-child(2){animation-delay:0.15s}
 .search-pulse span:nth-child(3){animation-delay:0.3s}
 .search-sources{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.search-provider-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;letter-spacing:.3px;margin-left:4px}
-.search-provider-badge.serper{background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.2)}
-.search-provider-badge.ddg{background:rgba(255,107,0,.1);color:#FF8C3A;border:1px solid rgba(255,107,0,.2)}
 .source-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);border-radius:20px;font-size:11px;color:#93C5FD;text-decoration:none;transition:var(--transition);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .source-chip:hover{background:rgba(59,130,246,0.15);color:#BFDBFE}
 .source-chip svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
@@ -224,7 +226,7 @@ textarea::placeholder{color:var(--subtle)}
 .att-btn .tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--s3);color:var(--text);font-size:11px;padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.15s;border:1px solid var(--border)}
 .att-btn:hover .tooltip{opacity:1}
 .input-hint{flex:1;text-align:right;font-size:11px;color:var(--subtle);padding-right:6px}
-/* file inputs handled inline in labels */
+input[type=file]{display:none}
 
 /* ── MODAL SYSTEM ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:16px}
@@ -253,7 +255,11 @@ textarea::placeholder{color:var(--subtle)}
 .mbtn.primary:disabled{opacity:0.5;transform:none;cursor:not-allowed}
 .mbtn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);margin-top:8px}
 .mbtn.ghost:hover{background:var(--s1);color:var(--text)}
-
+.mbtn.google{background:#fff;color:#1a1a1a;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:10px}
+.mbtn.google:hover{background:#f0f0f0;transform:translateY(-1px)}
+.google-icon{width:18px;height:18px}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:16px;color:var(--subtle);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .switch-text{font-size:13px;color:var(--muted);text-align:center;margin-top:16px}
 .switch-text a{color:var(--sun-light);cursor:pointer;font-weight:600}
 .switch-text a:hover{text-decoration:underline}
@@ -356,6 +362,12 @@ textarea::placeholder{color:var(--subtle)}
   </div>
 </header>
 
+<!-- EMAIL VERIFY BANNER -->
+<div id="verify-banner">
+  📧 Please verify your email to unlock full features.
+  <a onclick="resendVerification()">Resend verification</a>
+</div>
+
 <!-- USAGE STRIP -->
 <div class="usage-strip" id="usage-strip">
   <div class="usage-row">
@@ -431,29 +443,25 @@ textarea::placeholder{color:var(--subtle)}
       </button>
     </div>
     <div class="input-bottom">
-      <!-- Image attach -->
-      <button class="att-btn" title="Attach Image" type="button" onclick="openImgPicker()">
+      <button class="att-btn" onclick="document.getElementById('img-inp').click()" title="Attach Image">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         <span class="tooltip">Attach Image</span>
       </button>
-      <input type="file" id="img-inp" accept="image/*" onchange="attachImg(this)" style="display:none">
-
-      <!-- File attach -->
-      <button class="att-btn" title="Attach File" type="button" onclick="openFilePicker()">
+      <button class="att-btn" onclick="document.getElementById('file-inp').click()" title="Attach File">
         <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
         <span class="tooltip">Attach File</span>
       </button>
-      <input type="file" id="file-inp" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)" style="display:none">
-
       <button class="att-btn" id="voice-btn" onclick="toggleVoice()" title="Voice Input">
         <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         <span class="tooltip">Voice Input</span>
       </button>
-      <span class="input-hint" id="input-hint">SUNAI v6.1 · Enter to send</span>
+      <span class="input-hint" id="input-hint">SUNAI v5.0 · Enter to send</span>
     </div>
   </div>
 </div>
 
+<input type="file" id="img-inp" accept="image/*" onchange="attachImg(this)">
+<input type="file" id="file-inp" accept=".pdf,.txt,.py,.js,.html,.css,.csv,.md" onchange="attachFile(this)">
 
 <div class="toast-container" id="toast"></div>
 
@@ -465,7 +473,11 @@ textarea::placeholder{color:var(--subtle)}
       <button id="tab-signup" class="active" onclick="switchTab('signup')">Sign Up</button>
       <button id="tab-login" onclick="switchTab('login')">Log In</button>
     </div>
-
+    <button class="mbtn google" onclick="window.location.href='/auth/google'">
+      <svg class="google-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+    <div class="divider">or</div>
     <h2 id="auth-title">Create account</h2>
     <p class="modal-sub" id="auth-sub">Unlock chat history, AI memory, voice input, and more.</p>
     <div class="field" id="field-name"><label>Name</label><input type="text" id="auth-name" placeholder="Your name"></div>
@@ -671,13 +683,7 @@ async function loadHistory() {
     data.history.forEach(item => {
       const role = item.role === 'assistant' ? 'assistant' : 'user';
       state.messages.push({role, content: item.content});
-      // Show image/file messages with a visual label, not raw text
-      const c = item.content || '';
-      const display = c.startsWith('[Image]') ? '🖼 ' + c.replace('[Image]','').trim()
-                    : c.startsWith('[Image Gen]') ? '🎨 ' + c.replace('[Image Gen]','').trim()
-                    : c.startsWith('[File:') ? '📄 ' + c.replace(/\[File:.*?\]/,'').trim()
-                    : c;
-      appendMsg(role === 'assistant' ? 'ai' : 'user', display);
+      appendMsg(role === 'assistant' ? 'ai' : 'user', item.content);
     });
     smartScroll(true);
     renderHistList();
@@ -693,6 +699,7 @@ function renderUI() {
   const planPill   = document.getElementById('plan-pill');
   const usageStrip = document.getElementById('usage-strip');
   const modeTabs   = document.getElementById('mode-tabs');
+  const verifyBanner = document.getElementById('verify-banner');
 
   if (state.isLoggedIn && state.user) {
     btnLogin.style.display  = 'none';
@@ -705,6 +712,8 @@ function renderUI() {
     modeTabs.style.display   = 'flex';
     btnAdmin.style.display   = state.user.role === 'admin' ? 'flex' : 'none';
 
+    // Email verification banner
+    verifyBanner.style.display = state.user.email_verified === false ? 'block' : 'none';
 
     // Usage bar
     const limit   = state.user.plan === 'pro' ? '∞' : (state.user.used_today + state.user.remaining);
@@ -729,6 +738,7 @@ function renderUI() {
     planPill.style.display   = 'none';
     usageStrip.style.display = 'none';
     modeTabs.style.display   = 'none';
+    verifyBanner.style.display = 'none';
     document.getElementById('drawer-footer').style.display = 'none';
     document.getElementById('hist-body').innerHTML = `<div style="font-size:13.5px;color:var(--muted);text-align:center;padding:32px 16px;line-height:1.7">Sign in to save<br>conversations permanently.</div>`;
   }
@@ -736,60 +746,23 @@ function renderUI() {
 
 function renderHistList() {
   const histBody = document.getElementById('hist-body');
-  if (!state.isLoggedIn) {
-    histBody.innerHTML = '<div style="font-size:12.5px;color:var(--subtle);text-align:center;padding:20px">Sign in to see history.</div>';
+  if (!state.isLoggedIn || state.messages.length === 0) {
+    histBody.innerHTML = `<div style="font-size:12.5px;color:var(--subtle);text-align:center;padding:20px">No recent conversations.</div>`;
     return;
   }
-
-  // Build session groups from state.messages
-  // Each "session" starts at a user message after an assistant message (or the very first user msg)
-  const sessions = [];
-  let current = null;
-  for (const m of state.messages) {
-    if (m.role === 'user') {
-      if (!current) {
-        current = { title: m.content, messages: [m] };
-        sessions.push(current);
-      } else {
-        current.messages.push(m);
-      }
-    } else if (m.role === 'assistant' && current) {
-      current.messages.push(m);
-    }
-  }
-
-  if (sessions.length === 0) {
-    histBody.innerHTML = '<div style="font-size:12.5px;color:var(--subtle);text-align:center;padding:20px">No conversations yet.</div>';
-    return;
-  }
-
-  // Show all user messages as browsable history items
-  const userMsgs = state.messages.filter(m => m.role === 'user');
-  let html = '<div class="hist-date-label">All conversations</div>';
-  userMsgs.slice().reverse().forEach((m, i) => {
-    const raw = m.content || '';
-    const label = raw.startsWith('[Image]') ? '🖼 ' + raw.replace('[Image]','').trim()
-                : raw.startsWith('[Image Gen]') ? '🎨 ' + raw.replace('[Image Gen]','').trim()
-                : raw.startsWith('[File:') ? '📄 ' + raw.replace(/\[File:.*?\]/,'').trim()
-                : raw;
-    const display = escHtml(label.substring(0, 30)) + (label.length > 30 ? '…' : '');
-    const isFirst = i === userMsgs.length - 1;
-    html += \`<div class="hist-item" \${isFirst ? 'style="background:var(--s1)"' : ''}>
+  const first = state.messages.find(m => m.role === 'user');
+  const title = first ? first.content.substring(0, 26) + '…' : 'Active Chat';
+  histBody.innerHTML = `
+    <div class="hist-date-label">Current Session</div>
+    <div class="hist-item" style="background:var(--s1)">
       <div class="hist-item-left">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span>\${display}</span>
+        <span>${escHtml(title)}</span>
       </div>
-    </div>\`;
-  });
-
-  html += \`<div style="margin-top:8px">
-    <button class="hist-delete-btn" style="width:100%;padding:6px;font-size:12px;color:var(--subtle)" onclick="clearHistoryLogs(event)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;vertical-align:-2px;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      Clear all history
-    </button>
-  </div>\`;
-
-  histBody.innerHTML = html;
+      <button class="hist-delete-btn" onclick="clearHistoryLogs(event)" title="Clear history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    </div>`;
 }
 
 // ── MODE TABS ─────────────────────────────────────────────────────────────────
@@ -798,7 +771,7 @@ function setMode(mode) {
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + mode)?.classList.add('active');
   if (mode === 'chat') {
-    document.getElementById('input-hint').innerText = 'SUNAI v6.0 · Enter to send';
+    document.getElementById('input-hint').innerText = 'SUNAI v5.0 · Enter to send';
     inpEl.placeholder = 'Ask SUNAI anything…';
   } else if (mode === 'imagine') {
     document.getElementById('input-hint').innerText = 'Describe an image to generate';
@@ -832,24 +805,6 @@ function newChat() {
 function q(text) { inpEl.value = text; grow(inpEl); send(); }
 
 // ── ATTACHMENTS ────────────────────────────────────────────────────────────────
-function openImgPicker() {
-  const inp = document.getElementById('img-inp');
-  inp.style.display = 'block';
-  inp.style.position = 'fixed';
-  inp.style.top = '-9999px';
-  inp.click();
-  setTimeout(()=>{ inp.style.display='none'; }, 500);
-}
-
-function openFilePicker() {
-  const inp = document.getElementById('file-inp');
-  inp.style.display = 'block';
-  inp.style.position = 'fixed';
-  inp.style.top = '-9999px';
-  inp.click();
-  setTimeout(()=>{ inp.style.display='none'; }, 500);
-}
-
 function attachImg(input) {
   const file = input.files[0];
   if (!file) return;
@@ -882,8 +837,8 @@ function attachFile(input) {
 function removeAttach() {
   state.activeAttachment = {type:null,fileBlob:null,name:'',fileType:'',previewUrl:''};
   document.getElementById('attach-bar').style.display = 'none';
-  try { document.getElementById('img-inp').value = ''; } catch(e){}
-  try { document.getElementById('file-inp').value = ''; } catch(e){}
+  document.getElementById('img-inp').value = '';
+  document.getElementById('file-inp').value = '';
 }
 
 // ── VOICE INPUT ────────────────────────────────────────────────────────────────
@@ -970,16 +925,10 @@ async function send() {
   removeAttach();
   inpEl.value = '';
   inpEl.style.height = '24px';
-  if (text) state.messages.push({role:'user',content:text});
+  state.messages.push({role:'user',content:text});
   appendMsg('user', text, att);
 
   if (state.currentMode === 'imagine') {
-    if (!text) {
-      appendMsg('ai', '💡 Please describe the image you want to generate. For example: "A sunset over mountains in watercolor style"');
-      state.isGenerating = false;
-      sndBtn.disabled = false;
-      return;
-    }
     await doImageGen(text);
   } else if (att.type === 'image') {
     await doImageAnalysis(text, att);
@@ -1014,20 +963,19 @@ async function doStreamChat(userText) {
       signal: state.abortController.signal,
     });
 
+    loader.remove();
     if (!res.ok) {
-      loader.remove();
       const err = await res.json().catch(()=>({}));
       appendMsg('ai', `⚠️ ${err.message || err.error || 'Request failed'}`);
       return;
     }
 
-    // Replace the loader IN-PLACE with the AI bubble — preserves correct order
-    const _pid = 'sp_' + Date.now();
-    loader.className = 'msg-group ai';
-    loader.id = '';
-    loader.innerHTML = `<div class="ai-av"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div><div class="bubble"><div class="markdown-payload" id="${_pid}"></div></div>`;
-    const aiGroup = loader;
-    const payloadEl = document.getElementById(_pid);
+    // Create streaming message bubble
+    const aiGroup = document.createElement('div');
+    aiGroup.className = 'msg-group ai';
+    aiGroup.innerHTML = `<div class="ai-av"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div><div class="bubble"><div class="markdown-payload" id="stream-payload"></div></div>`;
+    chatEl.appendChild(aiGroup);
+    const payloadEl = document.getElementById('stream-payload');
 
     const reader  = res.body.getReader();
     const decoder = new TextDecoder();
@@ -1045,16 +993,13 @@ async function doStreamChat(userText) {
         try {
           const obj = JSON.parse(line.slice(6));
           if (obj.searching) {
-            // Show "Searching web…" indicator with provider badge + source chips
-            const sources  = (obj.sources || []).slice(0, 4);
-            const provider = obj.provider || 'duckduckgo';
-            const badgeClass = provider === 'serper' ? 'serper' : 'ddg';
-            const badgeLabel = provider === 'serper' ? 'Google via Serper' : 'DuckDuckGo';
+            // Show "Searching web…" indicator with source chips
+            const sources = (obj.sources || []).slice(0, 4);
             const chips = sources.map(url => {
               let host = url; try { host = new URL(url).hostname.replace('www.',''); } catch(e){}
               return `<a class="source-chip" href="${url}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>${host}</a>`;
             }).join('');
-            payloadEl.innerHTML = `<div class="search-indicator"><div class="search-pulse"><span></span><span></span><span></span></div><span>Searching the web…</span><span class="search-provider-badge ${badgeClass}">${badgeLabel}</span></div>${chips ? `<div class="search-sources">${chips}</div>` : ''}`;
+            payloadEl.innerHTML = `<div class="search-indicator"><div class="search-pulse"><span></span><span></span><span></span></div><span>Searching the web…</span></div>${chips ? `<div class="search-sources">${chips}</div>` : ''}`;
             smartScroll();
           }
           if (obj.token) {
@@ -1092,18 +1037,7 @@ async function doStreamChat(userText) {
             }
           }
           if (obj.error) {
-            const raw = obj.error || '';
-            let friendly = '⚠️ Something went wrong. Please try again.';
-            if (raw.includes('rate_limit') || raw.includes('Rate limit') || raw.includes('429')) {
-              friendly = '⚠️ SUNAI is getting too many requests right now. Please wait a minute and try again.';
-            } else if (raw.includes('quota') || raw.includes('exceeded')) {
-              friendly = '⚠️ Daily AI quota reached. Please try again tomorrow or upgrade to Pro.';
-            } else if (raw.includes('timeout') || raw.includes('timed out')) {
-              friendly = '⚠️ Request timed out. Please try again.';
-            } else if (raw.includes('connection') || raw.includes('network')) {
-              friendly = '⚠️ Connection error. Check your internet and try again.';
-            }
-            payloadEl.innerHTML = `<span style="color:var(--red)">${friendly}</span>`;
+            payloadEl.innerHTML = `⚠️ ${escHtml(obj.error)}`;
           }
         } catch {}
       }
@@ -1154,10 +1088,8 @@ async function doImageAnalysis(question, att) {
   sndBtn.disabled = true;
   const loader = addLoader();
   try {
-    if (!state.messages.find(m => m.role==='user' && m.content===(question||'Describe this image in detail.')))
-      state.messages.push({role:'user', content: question || 'Describe this image in detail.'});
     const fd = new FormData();
-    fd.append('image', att.fileBlob, att.name || 'image.jpg');
+    fd.append('image', att.fileBlob);
     fd.append('question', question || 'Describe this image in detail.');
     const res  = await fetch('/analyze-image', {method:'POST',body:fd});
     loader.remove();
@@ -1165,8 +1097,7 @@ async function doImageAnalysis(question, att) {
       const data = await res.json();
       state.messages.push({role:'assistant',content:data.reply});
       appendMsg('ai', data.reply);
-      if (state.user && data.remaining !== undefined) { state.user.remaining = data.remaining; renderUI(); }
-      renderHistList();
+      if (state.user) { state.user.remaining = Math.max(0,(state.user.remaining||1)-1); renderUI(); }
     } else {
       const err = await res.json().catch(()=>({}));
       appendMsg('ai', `⚠️ ${err.error || 'Image analysis failed'}`);
@@ -1185,10 +1116,8 @@ async function doFileAnalysis(question, att) {
   sndBtn.disabled = true;
   const loader = addLoader();
   try {
-    if (!state.messages.find(m => m.role==='user' && m.content===(question||'Summarize this document.')))
-      state.messages.push({role:'user', content: question || 'Summarize this document.'});
     const fd = new FormData();
-    fd.append('file', att.fileBlob, att.name || 'file.txt');
+    fd.append('file', att.fileBlob);
     fd.append('question', question || 'Summarize this document.');
     const res  = await fetch('/analyze-file', {method:'POST',body:fd});
     loader.remove();
@@ -1196,8 +1125,7 @@ async function doFileAnalysis(question, att) {
       const data = await res.json();
       state.messages.push({role:'assistant',content:data.reply});
       appendMsg('ai', data.reply);
-      if (state.user && data.remaining !== undefined) { state.user.remaining = data.remaining; renderUI(); }
-      renderHistList();
+      if (state.user) { state.user.remaining = Math.max(0,(state.user.remaining||1)-1); renderUI(); }
     } else {
       const err = await res.json().catch(()=>({}));
       appendMsg('ai', `⚠️ ${err.error || 'File analysis failed'}`);
@@ -1264,7 +1192,7 @@ function renderMath(el) {
 function addLoader() {
   const el = document.createElement('div');
   el.className = 'msg-group ai';
-  el.id = 'loader_' + Date.now();
+  el.id = 'ai-loader';
   el.innerHTML = `<div class="ai-av"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div><div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
   chatEl.appendChild(el);
   smartScroll();
@@ -1356,6 +1284,13 @@ async function submitAuth() {
 }
 
 function logout() { window.location.href='/logout'; }
+
+async function resendVerification() {
+  try {
+    await fetch('/resend-verification', {method:'POST'});
+    showToast('Verification email sent!');
+  } catch (e) { showToast('Failed to send email'); }
+}
 
 // ── FORGOT PASSWORD ────────────────────────────────────────────────────────────
 function openForgotPassword() { closeAuth(); document.getElementById('forgot-modal').classList.add('show'); }
